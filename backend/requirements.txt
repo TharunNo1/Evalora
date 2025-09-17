@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+python-dotenv
+google-cloud-speech
+google-auth
+google-auth-oauthlib
+google-auth-httplib2
+websockets
+pydantic
