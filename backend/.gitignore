@@ -67,3 +67,6 @@ transcript.txt
 # Coverage reports
 .coverage
 htmlcov/
+
+summaries/* 
+uploads/*

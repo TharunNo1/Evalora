@@ -218,7 +218,7 @@ async def export_data(session_id: str, format: str):
     return {"error": "Invalid format"}
 
 
-def evaluate_startup_documents(uploaded_files, founder_name, founder_email, startup_name, request_id):
+async def evaluate_startup_documents(uploaded_files, founder_name, founder_email, startup_name, request_id):
     # texts = ["Not Available", "Not Available", "Not applicable", "Not applicable"]
     docs = dict()
     for topic, file_path in uploaded_files.items():
@@ -228,7 +228,7 @@ def evaluate_startup_documents(uploaded_files, founder_name, founder_email, star
             text = extract_text_ppt(file_path)
         docs[topic] = text
     
-    summary = geminiClient.analyze_documents(request_id=request_id,founder_name=founder_name,founder_email=founder_email,startup_name=startup_name,docs=docs)
+    summary = await geminiClient.analyze_documents(request_id=request_id,founder_name=founder_name,founder_email=founder_email,startup_name=startup_name,docs=docs)
 
     # combined_text = "\n\n".join(texts)
 
@@ -995,14 +995,14 @@ async def analyze_documents(
     # await fm.send_message(message)
 
     # 2️⃣ Add background task to process documents & LLM
-    # background_tasks.add_task(
-    #     evaluate_startup_documents,
-    #     uploaded_files,
-    #     founder_name,
-    #     founder_email,
-    #     startup_name,
-    #     request_id
-    # )
+    background_tasks.add_task(
+        evaluate_startup_documents,
+        uploaded_files,
+        founder_name,
+        founder_email,
+        startup_name,
+        request_id
+    )
 
      # 3️⃣ Return immediate response
     return {"message": "Request submitted successfully!", 

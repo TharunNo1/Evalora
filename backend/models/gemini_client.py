@@ -715,9 +715,9 @@ This business plan contains confidential and proprietary information. Any reprod
 ######## Pitch deck: ###########
     {docs.get("pitchDeck", "Not Available")}
 ######## Additional Document 1: ###########
-    {docs.get("otherDoc1", "Not applicable")}
+    {docs.get("otherDoc1", "Not Applicable")}
 ######## Additional Document 2: ###########
-   {docs.get("otherDoc2", "Not applicable")}
+   {docs.get("otherDoc2", "Not Applicable")}
 
     """
  
@@ -735,17 +735,13 @@ This business plan contains confidential and proprietary information. Any reprod
         Extracts text, builds prompt, and queries Gemini model.
         `docs` should be a dict with file paths: { "founderChecklist": path, ... }
         """
-        extracted = {}
-        for key, path in docs.items():
-            if path:
-                extracted[key] = self.extract_text(path)
 
         prompt = self.build_prompt(
             request_id=request_id,
             founder_name=founder_name,
             founder_email=founder_email,
             startup_name=startup_name,
-            docs=extracted,
+            docs=docs,
         )
 
         response = self.model.generate_content(prompt)
