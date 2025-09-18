@@ -7,3 +7,12 @@ google-auth-oauthlib
 google-auth-httplib2
 websockets
 pydantic
+python-docx
+openpyxl
+reportlab
+python-pptx
+gtts 
+openai
+fastapi-mail
+whisper
+python-multipart

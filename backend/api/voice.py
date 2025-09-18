@@ -2,7 +2,7 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from models.speech_client import GoogleSpeechClient
 from models.gemini_client import GeminiClient
 from schemas.voice import GeminiResponse
-from utils.audio import decode_audio_base64
+from utils.audio_utils import decode_audio_base64
 from config import GOOGLE_APPLICATION_CREDENTIALS, SPEECH_SCOPES
 import os
 

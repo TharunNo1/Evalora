@@ -1,59 +1,7 @@
-# import base64
-# from typing import Any
+# Define texts as a list of document contents before using it in the prompt
+texts = ["Founder checklist content here", "Pitch deck content here", "Additional Document 1 content here", "Additional Document 2 content here"]
 
-# class GeminiClient:
-#     """
-#     Wrapper for Gemini LLM API
-#     """
-
-#     def __init__(self, api_key: str):
-#         self.api_key = api_key
-#         # initialize Gemini SDK / REST client here
-
-#     def generate_response(self, prompt: str) -> str:
-#         """
-#         Generate text response from Gemini LLM
-#         """
-#         # TODO: integrate with Gemini SDK
-#         return f"Echo: {prompt}"  # placeholder
-
-#     def text_to_speech_base64(self, text: str) -> str:
-#         """
-#         Convert text to audio and encode as base64
-#         """
-#         # TODO: integrate Google Text-to-Speech SDK
-#         dummy_audio = b"FAKE_WAV_BYTES"
-#         return base64.b64encode(dummy_audio).decode("utf-8")
-import os
-from typing import Dict, Optional
-import google.generativeai as genai
-
-
-class GeminiClient:
-    def __init__(self, api_key: Optional[str] = None, model_name: str = "gemini-1.5-flash"):
-        """
-        GeminiService handles interaction with Google's Gemini model for document analysis.
-        """
-        self.api_key = api_key or os.getenv("GEMINI_API_KEY")
-        # if not self.api_key:
-        #     raise ValueError("Gemini API key is missing. Set GEMINI_API_KEY environment variable.")
-        
-        # genai.configure(api_key=self.api_key)
-        # self.model = genai.GenerativeModel(model_name)
-
-    # ---------- Prompt Builder ----------
-    def build_prompt(
-        self,
-        request_id: str,
-        founder_name: str,
-        founder_email: str,
-        startup_name: str,
-        docs: Dict[str, str]
-    ) -> str:
-        """
-        Builds structured prompt for Gemini model.
-        """
-        return f"""
+prompt = f"""
     You are analyzing startup founder documents (pitch deck & checklist). Provide the following template completely filled with necessary details grounded as per documents data:
 
 # COMPREHENSIVE INVESTOR-READY BUSINESS PLAN
@@ -732,42 +680,12 @@ This business plan contains confidential and proprietary information. Any reprod
 
     Here are the contents of various documents:
 ######## Founder Checklist: ###########
-    {docs.get("founderChecklist", "Not Available")}
+    {texts[0]}
 ######## Pitch deck: ###########
-    {docs.get("pitchDeck", "Not Available")}
+    {texts[1]}
 ######## Additional Document 1: ###########
-    {docs.get("otherDoc1", "Not applicable")}
+    {texts[2]}
 ######## Additional Document 2: ###########
-   {docs.get("otherDoc2", "Not applicable")}
+    {texts[3]}
 
     """
- 
-
-    # ---------- Gemini Interaction ----------
-    async def analyze_documents(
-        self,
-        request_id: str,
-        founder_name: str,
-        founder_email: str,
-        startup_name: str,
-        docs: Dict[str, str],
-    ) -> str:
-        """
-        Extracts text, builds prompt, and queries Gemini model.
-        `docs` should be a dict with file paths: { "founderChecklist": path, ... }
-        """
-        extracted = {}
-        for key, path in docs.items():
-            if path:
-                extracted[key] = self.extract_text(path)
-
-        prompt = self.build_prompt(
-            request_id=request_id,
-            founder_name=founder_name,
-            founder_email=founder_email,
-            startup_name=startup_name,
-            docs=extracted,
-        )
-
-        response = self.model.generate_content(prompt)
-        return response.text
