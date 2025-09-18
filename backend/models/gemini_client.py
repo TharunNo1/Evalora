@@ -1,29 +1,3 @@
-# import base64
-# from typing import Any
-
-# class GeminiClient:
-#     """
-#     Wrapper for Gemini LLM API
-#     """
-
-#     def __init__(self, api_key: str):
-#         self.api_key = api_key
-#         # initialize Gemini SDK / REST client here
-
-#     def generate_response(self, prompt: str) -> str:
-#         """
-#         Generate text response from Gemini LLM
-#         """
-#         # TODO: integrate with Gemini SDK
-#         return f"Echo: {prompt}"  # placeholder
-
-#     def text_to_speech_base64(self, text: str) -> str:
-#         """
-#         Convert text to audio and encode as base64
-#         """
-#         # TODO: integrate Google Text-to-Speech SDK
-#         dummy_audio = b"FAKE_WAV_BYTES"
-#         return base64.b64encode(dummy_audio).decode("utf-8")
 import os
 from typing import Dict, Optional
 import google.generativeai as genai
@@ -35,11 +9,11 @@ class GeminiClient:
         GeminiService handles interaction with Google's Gemini model for document analysis.
         """
         self.api_key = api_key or os.getenv("GEMINI_API_KEY")
-        # if not self.api_key:
-        #     raise ValueError("Gemini API key is missing. Set GEMINI_API_KEY environment variable.")
+        if not self.api_key:
+            raise ValueError("Gemini API key is missing. Set GEMINI_API_KEY environment variable.")
         
-        # genai.configure(api_key=self.api_key)
-        # self.model = genai.GenerativeModel(model_name)
+        genai.configure(api_key=self.api_key)
+        self.model = genai.GenerativeModel(model_name)
 
     # ---------- Prompt Builder ----------
     def build_prompt(
@@ -54,9 +28,14 @@ class GeminiClient:
         Builds structured prompt for Gemini model.
         """
         return f"""
-    You are analyzing startup founder documents (pitch deck & checklist). Provide the following template completely filled with necessary details grounded as per documents data:
+You are analyzing startup founder documents (pitch deck & checklist). Provide the following template completely filled with necessary details grounded as per documents data:
 
 # COMPREHENSIVE INVESTOR-READY BUSINESS PLAN
+
+request_id: {request_id}
+founder_name: {founder_name}
+founder_email: {founder_email}
+startup_name: {startup_name}
 
 ## EXECUTIVE SUMMARY
 *[This section should be written last but appears first - keep to 1-2 pages maximum]*
