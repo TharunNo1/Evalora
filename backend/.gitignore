@@ -52,6 +52,7 @@ env.bak/
 Thumbs.db
 
 # Google Cloud service account keys (never commit!)
+secrets/gmail_creditionals.json
 service-account*.json
 *.key
 

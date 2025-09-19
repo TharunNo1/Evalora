@@ -6,3 +6,9 @@ class AudioStreamRequest(BaseModel):
 class GeminiResponse(BaseModel):
     text: str
     audio_base64: str
+
+# --- Request model for offer -->
+class OfferRequest(BaseModel):
+    sdp: str
+    type: str
+    session_id: str = None
