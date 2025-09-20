@@ -1,4 +1,5 @@
 import 'package:evalora_app/screens/upload/upload_screen.dart';
+import 'package:evalora_app/screens/voicecall/voicecall_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/startup_provider.dart';
@@ -32,6 +33,14 @@ class DashboardScreen extends ConsumerWidget {
               ).push(MaterialPageRoute(builder: (_) => const UploadScreen()));
             },
             icon: const Icon(Icons.upload_file),
+          ),
+           IconButton(
+            onPressed: () {
+              Navigator.of(
+                context,
+              ).push(MaterialPageRoute(builder: (_) => const VoiceCallPage()));
+            },
+            icon: const Icon(Icons.voice_chat),
           ),
         ],
       ),
