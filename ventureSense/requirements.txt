@@ -1,0 +1,7 @@
+websockets
+google-generativeai
+google-cloud-aiplatform
+python-dotenv
+google-adk
+uvicorn
+fastapi
