@@ -3,22 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/auth_provider.dart';
 import '../dashboard/dashboard_screen.dart';
 import '../../widgets/input_text.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-
-// Future<void> signInWithGoogle() async {
-//  final GoogleSignIn googleSignIn = GoogleSignIn();
-//  final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
-//  if (googleUser != null) {
-//    final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-//    final credential = GoogleAuthProvider.credential(
-//      accessToken: googleAuth.accessToken,
-//      idToken: googleAuth.idToken,
-//    );
-//    UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
-//    print("Google user signed in: ${userCredential.user?.email}");
-//  }
-// }
 
 class SignInScreen extends ConsumerStatefulWidget {
   const SignInScreen({super.key});

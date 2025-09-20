@@ -1,4 +1,4 @@
-import 'dart:io' show File, Platform;
+import 'dart:io' show File;
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
@@ -55,7 +55,7 @@ class _UploadScreenState extends State<UploadScreen> {
   Future<void> addFilesToFormData(
       String fieldPrefix, List<PlatformFile> files, FormData formData) async {
     for (int i = 0; i < files.length; i++) {
-      final multipartFile = await MultipartFile.fromBytes(
+      final multipartFile = MultipartFile.fromBytes(
         files[i].bytes ?? Uint8List(0),
         filename: files[i].name,
       );
@@ -214,7 +214,7 @@ class _UploadScreenState extends State<UploadScreen> {
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
               trailing: ElevatedButton.icon(
                 icon: Icon(Icons.upload_file, color: Colors.white),
-                label: Text("Upload"),
+                label: Text("Upload", style: TextStyle(color: Colors.white)),
                 style: ElevatedButton.styleFrom(
                   shape:
                       RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
@@ -277,8 +277,8 @@ class _UploadScreenState extends State<UploadScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Upload Documents"),
-        backgroundColor: Colors.blueAccent,
+        title: Text("Evaluation Request Submission"),
+        backgroundColor: Colors.blueGrey.shade900,
         elevation: 3,
       ),
       body: SingleChildScrollView(
@@ -290,7 +290,7 @@ class _UploadScreenState extends State<UploadScreen> {
               Text("Request ID: $requestId",
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: Colors.blueAccent,
+                      color: Colors.blueGrey.shade900,
                       fontSize: 16)),
               SizedBox(height: 24),
               _buildTextField("Startup Name", (v) => startupName = v ?? ""),
@@ -370,7 +370,7 @@ class _UploadScreenState extends State<UploadScreen> {
                 ),
                 child: Text(
                   "Submit Request",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
                 ),
               ),
               SizedBox(height: 32),

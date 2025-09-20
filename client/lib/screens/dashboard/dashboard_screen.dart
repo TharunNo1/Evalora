@@ -1,9 +1,7 @@
 import 'dart:ui';
 import '../upload/upload_screen.dart';
-import 'package:client/screens/voicecall/voicecall_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-// import "package:client/widgets/startup_card.dart";
 import "package:client/screens/session/session_list_screen.dart";
 
 class DummyStartup {
@@ -62,16 +60,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 MaterialPageRoute(builder: (_) => const UploadScreen()),
               );
             },
-            icon: const Icon(Icons.upload_file),
+            icon: const Icon(Icons.upload),
           ),
-          IconButton(
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const VoiceCallPage()),
-              );
-            },
-            icon: const Icon(Icons.voice_chat),
-          ),
+
         ],
       ),
       body: SingleChildScrollView(
@@ -205,6 +196,7 @@ class _CategoryFilteredScreenState extends ConsumerState<CategoryFilteredScreen>
     return Scaffold(
       appBar: AppBar(
         title: Text('${widget.category.capitalize()} Ideas'),
+        backgroundColor: Colors.blueGrey.shade900
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),

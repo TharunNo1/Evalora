@@ -49,6 +49,9 @@ dependencies:
   flutter_tts: ^4.0.2
   audioplayers: ^6.5.1
   permission_handler: ^10.0.0
+  web_socket_channel: ^3.0.3
+  flutter_sound: ^9.28.0
+  
 
 dev_dependencies:
   flutter_test:

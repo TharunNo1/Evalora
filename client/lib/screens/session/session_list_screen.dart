@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'voice_chat_screen.dart';
+import 'voicecall_screen.dart';
 
 class SessionListScreen extends StatelessWidget {
   const SessionListScreen({super.key});
@@ -7,7 +7,11 @@ class SessionListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Evaluation Sessions')),
+      appBar: AppBar(
+        title: const Text('Evaluation Sessions'),
+        backgroundColor: Colors.blueGrey.shade900,
+      ),
+
       body: ListView.builder(
         padding: const EdgeInsets.all(16),
         itemCount: 4,
@@ -17,9 +21,9 @@ class SessionListScreen extends StatelessWidget {
             subtitle: const Text('AI-assisted voice session scheduled'),
             trailing: ElevatedButton(
               onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const VoiceChatScreen()),
-                );
+                Navigator.of(
+                  context,
+                ).push(MaterialPageRoute(builder: (_) => VoiceCallScreen()));
               },
               child: const Text('Join'),
             ),

@@ -1,16 +1,43 @@
-# client
+# Evalora
 
-A new Flutter project.
+## Project Overview
 
-## Getting Started
+This is a Flutter-based frontend application designed to help investors evaluate startups efficiently. The app provides a streamlined interface for scoring, reviewing, and tracking startup profiles, making investment decisions more data-driven and transparent.
 
-This project is a starting point for a Flutter application.
+## Features
 
-A few resources to get you started if this is your first Flutter project:
+- Browse and search startup profiles
+- Evaluate startups using customizable scoring criteria
+- View detailed analytics and evaluation history
+- User authentication and secure data storage
+- Responsive UI for mobile and web
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Installation
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+1. Ensure you have [Flutter](https://docs.flutter.dev/get-started/install) installed.
+2. Clone the repository:
+    ```bash
+    cd client
+    ```
+3. Install dependencies:
+    ```bash
+    flutter pub get
+    ```
+4. Run the app:
+    ```bash
+    flutter run
+    ```
+
+## Folder Structure
+
+- `lib/` - Main application code
+- `assets/` - Images, fonts, and other assets
+- `test/` - Unit and widget tests
+
+## Contributing
+
+Contributions are welcome! Please submit issues or pull requests for improvements or bug fixes.
+
+## License
+
+This project is licensed under the MIT License.
