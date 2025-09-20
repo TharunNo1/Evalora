@@ -13,7 +13,7 @@ class GmailService:
     def __init__(self,
                  credentials_file="secrets/gmail_credentials.json",
                  token_file="secrets/gmail_token.json",
-                 redirect_uri="http://localhost:8080/oauth2callback",
+                 redirect_uri="http://localhost:8000/oauth2callback",
                  scopes=None):
         self.credentials_file = credentials_file
         self.token_file = token_file
