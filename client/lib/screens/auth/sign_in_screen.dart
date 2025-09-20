@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../providers/auth_provider.dart';
+import '../auth/auth_provider.dart';
 import '../dashboard/dashboard_screen.dart';
 import '../../widgets/input_text.dart';
 
@@ -55,21 +55,33 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                               setState(() {
                                 loading = true;
                               });
-                              await ref
-                                  .read(authProvider.notifier)
-                                  .signIn(
-                                    usernameController.text,
-                                    passwordController.text,
+                              try {
+                                await ref
+                                    .read(authProvider.notifier)
+                                    .signIn(
+                                      usernameController.text.trim(),
+                                      passwordController.text.trim(),
+                                    );
+                                if (ref.read(authProvider) != null) {
+                                  Navigator.of(context).pushReplacement(
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                          const DashboardScreen(),
+                                    ),
                                   );
-                              setState(() {
-                                loading = false;
-                              });
-                              if (ref.read(authProvider) != null) {
-                                Navigator.of(context).pushReplacement(
-                                  MaterialPageRoute(
-                                    builder: (_) => const DashboardScreen(),
+                                }
+                              } catch (e) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      e.toString(),
+                                    ),
                                   ),
                                 );
+                              } finally {
+                                setState(() {
+                                  loading = false;
+                                });
                               }
                             },
                       child: loading
@@ -86,8 +98,30 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                   ),
                   const SizedBox(height: 8),
                   TextButton.icon(
-                    onPressed: () {
-                      /* TODO Google Sign-In */
+                    onPressed: () async {
+                      setState(() {
+                        loading = true;
+                      });
+                      try {
+                        await ref
+                            .read(authProvider.notifier)
+                            .signInWithGoogle();
+                        if (ref.read(authProvider) != null) {
+                          Navigator.of(context).pushReplacement(
+                            MaterialPageRoute(
+                              builder: (_) => const DashboardScreen(),
+                            ),
+                          );
+                        }
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(e.toString())),
+                        );
+                      } finally {
+                        setState(() {
+                          loading = false;
+                        });
+                      }
                     },
                     icon: const Icon(Icons.login),
                     label: const Text('Sign in with Google'),
