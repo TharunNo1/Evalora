@@ -10,14 +10,19 @@ import '../re_evaluation/re_evaluation_screen.dart';
 class DummyStartup {
   final int id;
   final String title;
-  final String category;
+  final List<String> categories; // e.g. ['technology', 'industry']
+  final Map<String, List<String>> subCategories;
+  // key = category, value = list of subcategories for that category
   final bool approved;
+  final String description;
 
   DummyStartup({
     required this.id,
     required this.title,
-    required this.category,
+    required this.categories,
+    required this.subCategories,
     required this.approved,
+    required this.description,
   });
 }
 
@@ -29,15 +34,131 @@ class DashboardScreen extends ConsumerStatefulWidget {
 }
 
 class _DashboardScreenState extends ConsumerState<DashboardScreen> {
-  final List<DummyStartup> startups = List.generate(
-    10,
-    (index) => DummyStartup(
-      id: index,
-      title: 'Idea #$index – Smart Widget',
-      category: index % 2 == 0 ? 'technology' : 'industry',
-      approved: index % 3 == 0,
+  // Example startups with categories and subcategories
+  final List<DummyStartup> startups = [
+    DummyStartup(
+      id: 1,
+      title: 'NeuroLink AI',
+      categories: ['technology'],
+      subCategories: {
+        'technology': ['AI', 'Machine Learning'],
+      },
+      approved: true,
+      description:
+          'Developing next-gen neural network models for real-time decision making in healthcare and robotics.',
     ),
-  );
+    DummyStartup(
+      id: 2,
+      title: 'EcoEnergy Solutions',
+      categories: ['industry'],
+      subCategories: {
+        'industry': ['Manufacturing', 'Clean Energy'],
+      },
+      approved: false,
+      description:
+          'Building modular clean-energy units to reduce carbon footprint in large-scale manufacturing plants.',
+    ),
+    DummyStartup(
+      id: 3,
+      title: 'SmartHealth Tracker',
+      categories: ['technology', 'industry'],
+      subCategories: {
+        'technology': ['IoT', 'Wearables'],
+        'industry': ['Healthcare'],
+      },
+      approved: true,
+      description:
+          'Wearable IoT device that continuously monitors vital signs and provides AI-driven health insights.',
+    ),
+    DummyStartup(
+      id: 4,
+      title: 'AgriTech Innovations',
+      categories: ['industry'],
+      subCategories: {
+        'industry': ['Retail', 'Agriculture'],
+      },
+      approved: false,
+      description:
+          'Digitizing farm-to-market supply chains with predictive analytics to cut food wastage.',
+    ),
+    DummyStartup(
+      id: 5,
+      title: 'FinMate App',
+      categories: ['technology'],
+      subCategories: {
+        'technology': ['Blockchain', 'FinTech'],
+      },
+      approved: true,
+      description:
+          'A blockchain-powered personal finance app enabling secure peer-to-peer micro-investments.',
+    ),
+    DummyStartup(
+      id: 6,
+      title: 'CleanWater Tech',
+      categories: ['industry'],
+      subCategories: {
+        'industry': ['Healthcare', 'Sustainability'],
+      },
+      approved: false,
+      description:
+          'Portable filtration units that deliver safe drinking water using solar-powered nano-filters.',
+    ),
+    DummyStartup(
+      id: 7,
+      title: 'EduLearn Platform',
+      categories: ['technology'],
+      subCategories: {
+        'technology': ['VR/AR', 'EdTech'],
+      },
+      approved: true,
+      description:
+          'Immersive VR/AR classrooms bringing interactive STEM education to remote schools worldwide.',
+    ),
+    DummyStartup(
+      id: 8,
+      title: 'GreenLogistics',
+      categories: ['industry'],
+      subCategories: {
+        'industry': ['Logistics', 'Sustainability'],
+      },
+      approved: false,
+      description:
+          'AI-optimized delivery routing platform to reduce fuel consumption and logistics costs.',
+    ),
+    DummyStartup(
+      id: 9,
+      title: 'AI-Powered Chatbot',
+      categories: ['technology'],
+      subCategories: {
+        'technology': ['AI', 'Conversational'],
+      },
+      approved: true,
+      description:
+          'Conversational AI assistant that provides multilingual customer support across digital channels.',
+    ),
+    DummyStartup(
+      id: 10,
+      title: 'Renewable Materials Co.',
+      categories: ['industry'],
+      subCategories: {
+        'industry': ['Manufacturing', 'Eco Materials'],
+      },
+      approved: false,
+      description:
+          'Creating biodegradable composite materials to replace single-use plastics in consumer goods.',
+    ),
+  ];
+
+  final Map<String, List<String>> subCategoriesMap = {
+    "technology": ["AI", "Blockchain", "Cloud", "VR/AR", "IoT"],
+    "industry": [
+      "Manufacturing",
+      "Retail",
+      "Healthcare",
+      "Finance",
+      "Logistics"
+    ]
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -174,24 +295,23 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         padding: const EdgeInsets.all(16),
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
           // Left side - Founder image
-      Expanded(
-        flex: 1,
-        child: Column(
-          children: [
-            Image.asset(
-              'assets/founder.png',
-              width: 120,
-              height: 120,
+          Expanded(
+            flex: 1,
+            child: Column(
+              children: [
+                Image.asset(
+                  'assets/founder.png',
+                  width: 120,
+                  height: 120,
+                ),
+                const SizedBox(height: 16),
+                Text('Founder', style: TextStyle(fontWeight: FontWeight.bold)),
+              ],
             ),
-            const SizedBox(height: 16),
-            Text('Founder', style: TextStyle(fontWeight: FontWeight.bold)),
-          ],
-        ),
-      ),
+          ),
           Expanded(
             flex: 3,
             child: SingleChildScrollView(
-
               child: Center(
                 child: Container(
                   margin: const EdgeInsets.all(36),
@@ -277,20 +397,20 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             ),
           ),
           // Right side - Investor image
-      Expanded(
-        flex: 1,
-        child: Column(
-          children: [
-            Image.asset(
-              'assets/investor.png',
-              width: 120,
-              height: 120,
+          Expanded(
+            flex: 1,
+            child: Column(
+              children: [
+                Image.asset(
+                  'assets/investor.png',
+                  width: 120,
+                  height: 120,
+                ),
+                const SizedBox(height: 16),
+                Text('Investor', style: TextStyle(fontWeight: FontWeight.bold)),
+              ],
             ),
-            const SizedBox(height: 16),
-            Text('Investor', style: TextStyle(fontWeight: FontWeight.bold)),
-          ],
-        ),
-      ),
+          ),
         ]),
       ),
       floatingActionButton: FloatingActionButton.extended(
@@ -324,10 +444,15 @@ class _CategoryFilteredScreenState
   String searchQuery = "";
   String? selectedSubCategory;
 
-  // Subcategories per main category
   final Map<String, List<String>> subCategoriesMap = {
-    "technology": ["AI", "Blockchain", "Cloud", "VR", "IoT"],
-    "industry": ["Manufacturing", "Retail", "Healthcare", "Finance"],
+    "technology": ["AI", "Blockchain", "Cloud", "VR/AR", "IoT"],
+    "industry": [
+      "Manufacturing",
+      "Retail",
+      "Healthcare",
+      "Finance",
+      "Logistics"
+    ]
   };
 
   @override
@@ -335,23 +460,25 @@ class _CategoryFilteredScreenState
     final String categoryKey = widget.category.toLowerCase();
     final List<String> subCategories = subCategoriesMap[categoryKey] ?? [];
 
-    // Compose dropdown list with 'null' for 'All'
-    final List<String?> dropdownItems = [null, ...subCategories];
+// Assume this value comes from a dropdown or user selection
+// If no subcategory is selected, keep it null or empty string
+    String selectedCategory = categoryKey;
+    String? selectedSub = selectedSubCategory; // <-- single String, e.g. "AI"
 
-    // Filtered list based on category, search query and subcategory
-    var filteredList = widget.startups.where((idea) {
-      final bool matchesCategory = idea.category.toLowerCase() == categoryKey;
-      final bool matchesSearch =
-          idea.title.toLowerCase().contains(searchQuery.toLowerCase());
-      final bool matchesSubcategory =
-          (selectedSubCategory == null || selectedSubCategory!.isEmpty)
-              ? true
-              : idea.title
-                  .toLowerCase()
-                  .contains(selectedSubCategory!.toLowerCase());
-      return matchesCategory && matchesSearch && matchesSubcategory;
+    final filteredList = widget.startups.where((startup) {
+      // Check main category
+      if (!startup.categories.contains(selectedCategory)) return false;
+
+      // Get startup's subcategories for that category
+      final subs = startup.subCategories[selectedCategory] ?? [];
+
+      // If no specific subcategory selected, just match category
+      if (selectedSub == null || selectedSub.isEmpty) return true;
+
+      // Otherwise match subcategory
+      return subs.contains(selectedSub);
     }).toList();
-
+    
     return Scaffold(
       appBar: AppBar(
           title: Text('${widget.category.capitalize()} Ideas'),
@@ -360,9 +487,7 @@ class _CategoryFilteredScreenState
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            if (subCategories.isNotEmpty) const SizedBox(height: 12),
-
-// Combined search bar and filter button
+            // Search and filter row
             SizedBox(
               height: 48,
               child: Row(
@@ -396,13 +521,13 @@ class _CategoryFilteredScreenState
                               borderRadius: BorderRadius.vertical(
                                   top: Radius.circular(18))),
                           builder: (context) {
-                            final List<String?> subCatOptions = [
+                            final List<String?> options = [
                               null,
                               ...subCategories
                             ];
                             return ListView(
                               shrinkWrap: true,
-                              children: subCatOptions.map((subCat) {
+                              children: options.map((subCat) {
                                 return ListTile(
                                   title: Text(subCat ?? 'All Subcategories'),
                                   onTap: () => Navigator.pop(context, subCat),
@@ -412,11 +537,10 @@ class _CategoryFilteredScreenState
                             );
                           },
                         );
-                        if (selected != null || selectedSubCategory != null) {
-                          setState(() {
-                            selectedSubCategory = selected;
-                          });
-                        }
+
+                        setState(() {
+                          selectedSubCategory = selected;
+                        });
                       },
                       icon: const Icon(Icons.filter_list),
                       label: Text(selectedSubCategory ?? 'All'),
@@ -437,66 +561,99 @@ class _CategoryFilteredScreenState
                   : GridView.builder(
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              mainAxisSpacing: 16,
-                              crossAxisSpacing: 16,
-                              childAspectRatio: 3 / 2),
+                        crossAxisCount: 4,
+                        mainAxisSpacing: 12,
+                        crossAxisSpacing: 12,
+                        childAspectRatio: 6 / 3,
+                      ),
                       itemCount: filteredList.length,
                       itemBuilder: (_, idx) {
                         var idea = filteredList[idx];
                         return Card(
-                          elevation: 4,
+                          elevation: 2,
                           shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(18)),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
                           child: Padding(
-                            padding: const EdgeInsets.all(14),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 10),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(
                                   children: [
                                     Icon(
-                                        categoryKey == "technology"
-                                            ? Icons.memory
-                                            : Icons.factory,
-                                        color: categoryKey == "technology"
-                                            ? Colors.indigo
-                                            : Colors.teal,
-                                        size: 22),
+                                      categoryKey == "technology"
+                                          ? Icons.memory
+                                          : Icons.factory,
+                                      color: categoryKey == "technology"
+                                          ? Colors.indigo
+                                          : Colors.teal,
+                                      size: 20,
+                                    ),
                                     const SizedBox(width: 6),
                                     Expanded(
                                       child: Text(
                                         idea.title,
                                         overflow: TextOverflow.ellipsis,
                                         style: const TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 15),
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 14,
+                                        ),
                                       ),
                                     )
                                   ],
                                 ),
-                                const SizedBox(height: 8),
+                                const SizedBox(height: 4),
                                 Text(
-                                  widget.category.capitalize(),
+                                  idea.subCategories[categoryKey]?.join(', ') ??
+                                      '',
                                   style: TextStyle(
-                                      color: categoryKey == "technology"
-                                          ? Colors.indigo
-                                          : Colors.teal,
-                                      fontWeight: FontWeight.bold),
+                                    color: categoryKey == "technology"
+                                        ? Colors.indigo
+                                        : Colors.teal,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  idea.description,
+                                  maxLines: 3, // limit to avoid overflow
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.black87,
+                                    height: 1.3,
+                                  ),
                                 ),
                                 const Spacer(),
-                                Text(
-                                  idea.approved ? "Approved" : "Pending",
-                                  style: const TextStyle(
-                                      color: Colors.green,
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w600),
-                                )
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: idea.approved
+                                        ? Colors.green.shade100
+                                        : Colors.orange.shade100,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Text(
+                                    idea.approved ? "Approved" : "Pending",
+                                    style: TextStyle(
+                                      color: idea.approved
+                                          ? Colors.green.shade800
+                                          : Colors.orange.shade800,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
                               ],
                             ),
                           ),
                         );
-                      }),
+                      },
+                    ),
             ),
           ],
         ),

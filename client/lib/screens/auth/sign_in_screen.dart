@@ -20,14 +20,15 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.blueGrey.shade900,
       body: Center(
         child: Container(
           padding: const EdgeInsets.all(24),
+          
           constraints: const BoxConstraints(maxWidth: 470),
           child: Card(
             elevation: 15,
-            color: Colors.black,
+            color: Colors.blueGrey.shade900,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(32),
               side: const BorderSide(
@@ -57,7 +58,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                     hint: 'Email or username',
                     textStyle: const TextStyle(color: Colors.white),
                     borderColor: Colors.white,
-                    fillColor: Colors.black,
+                    fillColor: Colors.blueGrey.shade900,
                     hintStyle: const TextStyle(color: Colors.white70),
                   ),
                   const SizedBox(height: 16),
@@ -67,7 +68,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                     obscure: true,
                     textStyle: const TextStyle(color: Colors.white),
                     borderColor: Colors.white,
-                    fillColor: Colors.black,
+                    fillColor: Colors.blueGrey.shade900,
                     hintStyle: const TextStyle(color: Colors.white70),
                   ),
                   const SizedBox(height: 20),
