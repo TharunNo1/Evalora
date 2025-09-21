@@ -34,6 +34,12 @@ class AuthNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> signUp(String email, String password) async {
+    final userCredential = await _auth.createUserWithEmailAndPassword(email: email, password: password);
+    currentUser = userCredential.user;
+    notifyListeners();
+  }
+
   Future<void> signInWithGoogle() async {
     // Use the global instance instead of calling constructor again
     final googleUser = await googleSignIn.signIn();
@@ -51,14 +57,13 @@ class AuthNotifier extends ChangeNotifier {
   }
 
   Future<void> signOut() async {
-  await googleSignIn.disconnect();  // Clear Google session & revoke permissions
-  await googleSignIn.signOut();     // Sign out GoogleSignIn
-  await _auth.signOut();              // Sign out Firebase Auth
+    await googleSignIn.disconnect();  // Clear Google session & revoke permissions
+    await googleSignIn.signOut();     // Sign out GoogleSignIn
+    await _auth.signOut();            // Sign out Firebase Auth
 
-  currentUser = null;
-  notifyListeners();
-}
-
+    currentUser = null;
+    notifyListeners();
+  }
 }
 
 // Provide AuthNotifier
