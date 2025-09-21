@@ -1,62 +1,99 @@
 import 'package:flutter/material.dart';
 
-class ReEvaluationScreen extends StatefulWidget {
-  const ReEvaluationScreen({super.key});
+class ReevaluationDialog {
+  /// Shows the Re-evaluation Request Form
+  static void show(BuildContext context) {
+    final _formKey = GlobalKey<FormState>();
+    final TextEditingController startupController = TextEditingController();
+    final TextEditingController ideaIdController = TextEditingController();
+    final TextEditingController reasonController = TextEditingController();
 
-  @override
-  State<ReEvaluationScreen> createState() => _ReEvaluationScreenState();
-}
-
-class _ReEvaluationScreenState extends State<ReEvaluationScreen> {
-  final evalId = TextEditingController();
-  final reason = TextEditingController();
-  bool sending = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Request Re-Evaluation')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            TextField(
-              controller: evalId,
-              decoration: const InputDecoration(hintText: 'Evaluation ID'),
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Request Re-evaluation'),
+        content: Form(
+          key: _formKey,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  controller: startupController,
+                  decoration: const InputDecoration(
+                    labelText: 'Startup Name',
+                    prefixIcon: Icon(Icons.business),
+                  ),
+                  validator: (value) =>
+                      value == null || value.isEmpty ? 'Enter startup name' : null,
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: ideaIdController,
+                  decoration: const InputDecoration(
+                    labelText: 'Idea Request ID',
+                    prefixIcon: Icon(Icons.confirmation_number),
+                  ),
+                  validator: (value) =>
+                      value == null || value.isEmpty ? 'Enter idea ID' : null,
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: reasonController,
+                  decoration: const InputDecoration(
+                    labelText: 'Reason for Re-evaluation',
+                    prefixIcon: Icon(Icons.notes),
+                  ),
+                  maxLines: 3,
+                  validator: (value) =>
+                      value == null || value.isEmpty ? 'Enter reason' : null,
+                ),
+              ],
             ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: reason,
-              decoration: const InputDecoration(
-                hintText: 'Reason / difficulties',
-              ),
-            ),
-            const SizedBox(height: 12),
-            ElevatedButton(
-              onPressed: sending
-                  ? null
-                  : () async {
-                      setState(() {
-                        sending = true;
-                      });
-                      await Future.delayed(const Duration(seconds: 1));
-                      setState(() {
-                        sending = false;
-                      });
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                            'Re-evaluation request sent to human agent',
-                          ),
-                        ),
-                      );
-                    },
-              child: sending
-                  ? const CircularProgressIndicator()
-                  : const Text('Submit'),
-            ),
-          ],
+          ),
         ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (_formKey.currentState!.validate()) {
+                final String startupName = startupController.text.trim();
+                final String ideaId = ideaIdController.text.trim();
+                final String reason = reasonController.text.trim();
+
+                // Generate a dummy evaluation ID
+                final String evaluationId =
+                    'EV-${DateTime.now().millisecondsSinceEpoch}';
+
+                Navigator.of(context).pop(); // Close the form
+
+                // Show confirmation dialog with Evaluation ID
+                showDialog(
+                  context: context,
+                  builder: (_) => AlertDialog(
+                    title: const Text('Request Submitted'),
+                    content: Text(
+                      'Your re-evaluation request has been submitted successfully.\n\n'
+                      'Startup Name: $startupName\n'
+                      'Idea Request ID: $ideaId\n'
+                      'Evaluation ID: $evaluationId',
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: const Text('OK'),
+                      ),
+                    ],
+                  ),
+                );
+              }
+            },
+            child: const Text('Submit'),
+          ),
+        ],
       ),
     );
   }

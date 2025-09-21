@@ -717,8 +717,8 @@ class _VoiceCallScreenState extends State<VoiceCallScreen>
                 SizedBox(height: 8),
                 Text(
                   isRecording
-                      ? "Recording..."
-                      : "Click the icon to start recording",
+                      ? "Click here to stop conversation"
+                      : "Click the icon to start conversation",
                   style: TextStyle(color: Colors.grey[600], fontSize: 14),
                 ),
               ],

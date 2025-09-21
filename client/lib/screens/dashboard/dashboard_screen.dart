@@ -3,9 +3,9 @@ import '../upload/upload_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:client/screens/session/session_list_screen.dart';
-// Import your auth provider (adjust path accordingly)
 import 'package:client/screens/auth/auth_provider.dart';
 import '../auth/sign_in_screen.dart';
+import '../re_evaluation/re_evaluation_screen.dart';
 
 class DummyStartup {
   final int id;
@@ -47,7 +47,17 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blueGrey.shade900,
-        title: const Text('Evalora - Dashboard'),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Image.asset(
+              'assets/logo.png',
+              height: 32, // adjust as needed
+            ),
+            const SizedBox(width: 12),
+            const Text('Evalora - Dashboard'),
+          ],
+        ),
         actions: [
           IconButton(
             onPressed: () {
@@ -72,8 +82,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
               return PopupMenuButton<String>(
                 offset: const Offset(0, 48),
-                shape:
-                    RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16)),
                 tooltip: 'Account',
                 onSelected: (value) async {
                   if (value == 'profile') {
@@ -105,7 +115,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                     // Call your logout method from authProvider
                     await ref.read(authProvider).signOut();
                     Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(builder: (context) => const SignInScreen()),
+                      MaterialPageRoute(
+                          builder: (context) => const SignInScreen()),
                       (route) => false,
                     );
                   }
@@ -118,8 +129,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                         backgroundImage: user.photoURL != null
                             ? NetworkImage(user.photoURL!)
                             : null,
-                        child:
-                            user.photoURL == null ? const Icon(Icons.person) : null,
+                        child: user.photoURL == null
+                            ? const Icon(Icons.person)
+                            : null,
                       ),
                       title: Text(user.displayName ?? ''),
                       subtitle: Text(user.email ?? ''),
@@ -140,8 +152,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       backgroundImage: user.photoURL != null
                           ? NetworkImage(user.photoURL!)
                           : null,
-                      child:
-                          user.photoURL == null ? const Icon(Icons.person) : null,
+                      child: user.photoURL == null
+                          ? const Icon(Icons.person)
+                          : null,
                     ),
                     const SizedBox(width: 8),
                     Text(
@@ -157,90 +170,136 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Center(
-          child: Container(
-            margin: const EdgeInsets.all(36),
-            padding: const EdgeInsets.all(40),
-            constraints: const BoxConstraints(maxWidth: 700),
-            decoration: BoxDecoration(
-              color: Colors.blueGrey.shade50,
-              borderRadius: BorderRadius.circular(36),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.blueGrey.withOpacity(0.07),
-                  blurRadius: 24,
-                  spreadRadius: 8,
-                  offset: const Offset(0, 0),
-                ),
-              ],
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          // Left side - Founder image
+      Expanded(
+        flex: 1,
+        child: Column(
+          children: [
+            Image.asset(
+              'assets/founder.png',
+              width: 120,
+              height: 120,
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    GlassInfoCard(
-                      title: 'Total Ideas',
-                      value: totalIdeas,
-                      icon: Icons.lightbulb_outline,
-                      color: Colors.indigo.shade400,
-                    ),
-                    GlassInfoCard(
-                      title: 'Approved Ideas',
-                      value: approvedIdeas,
-                      icon: Icons.check_circle_outline,
-                      color: Colors.green.shade400,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 60),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 34, horizontal: 32),
+            const SizedBox(height: 16),
+            Text('Founder', style: TextStyle(fontWeight: FontWeight.bold)),
+          ],
+        ),
+      ),
+          Expanded(
+            flex: 3,
+            child: SingleChildScrollView(
+
+              child: Center(
+                child: Container(
+                  margin: const EdgeInsets.all(36),
+                  padding: const EdgeInsets.all(40),
+                  constraints: const BoxConstraints(maxWidth: 700),
                   decoration: BoxDecoration(
-                    color: Colors.blueGrey.shade100,
-                    borderRadius: BorderRadius.circular(32),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      GlassCategoryCard(
-                        title: 'Technology',
-                        icon: Icons.memory,
-                        color: Colors.indigo.shade400,
-                        onTap: () {
-                          Navigator.of(context).push(MaterialPageRoute(
-                            builder: (_) => CategoryFilteredScreen(
-                              category: 'technology',
-                              startups: startups,
-                            ),
-                          ));
-                        },
+                    color: Colors.blueGrey.shade50,
+                    borderRadius: BorderRadius.circular(36),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.blueGrey.withOpacity(0.07),
+                        blurRadius: 24,
+                        spreadRadius: 8,
+                        offset: const Offset(0, 0),
                       ),
-                      const SizedBox(width: 40),
-                      GlassCategoryCard(
-                        title: 'Industry',
-                        icon: Icons.factory,
-                        color: Colors.teal.shade400,
-                        onTap: () {
-                          Navigator.of(context).push(MaterialPageRoute(
-                            builder: (_) => CategoryFilteredScreen(
-                              category: 'industry',
-                              startups: startups,
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          GlassInfoCard(
+                            title: 'Total Ideas',
+                            value: totalIdeas,
+                            icon: Icons.lightbulb_outline,
+                            color: Colors.indigo.shade400,
+                          ),
+                          GlassInfoCard(
+                            title: 'Approved Ideas',
+                            value: approvedIdeas,
+                            icon: Icons.check_circle_outline,
+                            color: Colors.green.shade400,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 60),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 34, horizontal: 32),
+                        decoration: BoxDecoration(
+                          color: Colors.blueGrey.shade100,
+                          borderRadius: BorderRadius.circular(32),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            GlassCategoryCard(
+                              title: 'Technology',
+                              icon: Icons.memory,
+                              color: Colors.indigo.shade400,
+                              onTap: () {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (_) => CategoryFilteredScreen(
+                                    category: 'technology',
+                                    startups: startups,
+                                  ),
+                                ));
+                              },
                             ),
-                          ));
-                        },
+                            const SizedBox(width: 40),
+                            GlassCategoryCard(
+                              title: 'Industry',
+                              icon: Icons.factory,
+                              color: Colors.teal.shade400,
+                              onTap: () {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (_) => CategoryFilteredScreen(
+                                    category: 'industry',
+                                    startups: startups,
+                                  ),
+                                ));
+                              },
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
                 ),
-              ],
+              ),
             ),
           ),
+          // Right side - Investor image
+      Expanded(
+        flex: 1,
+        child: Column(
+          children: [
+            Image.asset(
+              'assets/investor.png',
+              width: 120,
+              height: 120,
+            ),
+            const SizedBox(height: 16),
+            Text('Investor', style: TextStyle(fontWeight: FontWeight.bold)),
+          ],
         ),
       ),
+        ]),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => ReevaluationDialog.show(context),
+        label: const Text('Request Re-evaluation'),
+        icon: const Icon(Icons.refresh),
+        backgroundColor: Colors.blueGrey.shade900, // Button background color
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 }
@@ -256,10 +315,12 @@ class CategoryFilteredScreen extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<CategoryFilteredScreen> createState() => _CategoryFilteredScreenState();
+  ConsumerState<CategoryFilteredScreen> createState() =>
+      _CategoryFilteredScreenState();
 }
 
-class _CategoryFilteredScreenState extends ConsumerState<CategoryFilteredScreen> {
+class _CategoryFilteredScreenState
+    extends ConsumerState<CategoryFilteredScreen> {
   String searchQuery = "";
   String? selectedSubCategory;
 
@@ -280,17 +341,21 @@ class _CategoryFilteredScreenState extends ConsumerState<CategoryFilteredScreen>
     // Filtered list based on category, search query and subcategory
     var filteredList = widget.startups.where((idea) {
       final bool matchesCategory = idea.category.toLowerCase() == categoryKey;
-      final bool matchesSearch = idea.title.toLowerCase().contains(searchQuery.toLowerCase());
-      final bool matchesSubcategory = (selectedSubCategory == null ||
-          selectedSubCategory!.isEmpty) ? true : idea.title.toLowerCase().contains(selectedSubCategory!.toLowerCase());
+      final bool matchesSearch =
+          idea.title.toLowerCase().contains(searchQuery.toLowerCase());
+      final bool matchesSubcategory =
+          (selectedSubCategory == null || selectedSubCategory!.isEmpty)
+              ? true
+              : idea.title
+                  .toLowerCase()
+                  .contains(selectedSubCategory!.toLowerCase());
       return matchesCategory && matchesSearch && matchesSubcategory;
     }).toList();
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('${widget.category.capitalize()} Ideas'),
-        backgroundColor: Colors.blueGrey.shade900
-      ),
+          title: Text('${widget.category.capitalize()} Ideas'),
+          backgroundColor: Colors.blueGrey.shade900),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -310,8 +375,8 @@ class _CategoryFilteredScreenState extends ConsumerState<CategoryFilteredScreen>
                         prefixIcon: const Icon(Icons.search),
                         border: OutlineInputBorder(),
                         isDense: true,
-                        contentPadding:
-                            const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                        contentPadding: const EdgeInsets.symmetric(
+                            vertical: 12, horizontal: 16),
                       ),
                       onChanged: (value) {
                         setState(() {
@@ -328,10 +393,13 @@ class _CategoryFilteredScreenState extends ConsumerState<CategoryFilteredScreen>
                         final selected = await showModalBottomSheet<String?>(
                           context: context,
                           shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.vertical(top: Radius.circular(18))),
+                              borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(18))),
                           builder: (context) {
-                            final List<String?> subCatOptions = [null, ...subCategories];
+                            final List<String?> subCatOptions = [
+                              null,
+                              ...subCategories
+                            ];
                             return ListView(
                               shrinkWrap: true,
                               children: subCatOptions.map((subCat) {
@@ -367,14 +435,19 @@ class _CategoryFilteredScreenState extends ConsumerState<CategoryFilteredScreen>
               child: filteredList.isEmpty
                   ? const Center(child: Text("No results found"))
                   : GridView.builder(
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2, mainAxisSpacing: 16, crossAxisSpacing: 16, childAspectRatio: 3 / 2),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              mainAxisSpacing: 16,
+                              crossAxisSpacing: 16,
+                              childAspectRatio: 3 / 2),
                       itemCount: filteredList.length,
                       itemBuilder: (_, idx) {
                         var idea = filteredList[idx];
                         return Card(
                           elevation: 4,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(18)),
                           child: Padding(
                             padding: const EdgeInsets.all(14),
                             child: Column(
@@ -383,15 +456,21 @@ class _CategoryFilteredScreenState extends ConsumerState<CategoryFilteredScreen>
                                 Row(
                                   children: [
                                     Icon(
-                                        categoryKey == "technology" ? Icons.memory : Icons.factory,
-                                        color: categoryKey == "technology" ? Colors.indigo : Colors.teal,
+                                        categoryKey == "technology"
+                                            ? Icons.memory
+                                            : Icons.factory,
+                                        color: categoryKey == "technology"
+                                            ? Colors.indigo
+                                            : Colors.teal,
                                         size: 22),
                                     const SizedBox(width: 6),
                                     Expanded(
                                       child: Text(
                                         idea.title,
                                         overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 15),
                                       ),
                                     )
                                   ],
@@ -400,13 +479,18 @@ class _CategoryFilteredScreenState extends ConsumerState<CategoryFilteredScreen>
                                 Text(
                                   widget.category.capitalize(),
                                   style: TextStyle(
-                                      color: categoryKey == "technology" ? Colors.indigo : Colors.teal,
+                                      color: categoryKey == "technology"
+                                          ? Colors.indigo
+                                          : Colors.teal,
                                       fontWeight: FontWeight.bold),
                                 ),
                                 const Spacer(),
                                 Text(
                                   idea.approved ? "Approved" : "Pending",
-                                  style: const TextStyle(color: Colors.green, fontSize: 13, fontWeight: FontWeight.w600),
+                                  style: const TextStyle(
+                                      color: Colors.green,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600),
                                 )
                               ],
                             ),
