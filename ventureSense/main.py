@@ -31,8 +31,7 @@ async def startup_event():
     """
     Start the internal ADK streaming server tasks when FastAPI boots.
     """
-    streaming_service = StreamingService()
-    await streaming_service.start_server()
+
     
     init(project=PROJECT_ID, location=LOCATION)
 
@@ -43,6 +42,8 @@ async def websocket_endpoint(websocket: WebSocket):
     """
     await websocket.accept()
     client_id = id(websocket)  # Unique ID per connection
+
+    streaming_service = StreamingService()
 
     try:
         # Use the same handler as in your standalone service

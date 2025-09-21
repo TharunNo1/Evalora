@@ -8,7 +8,7 @@ from websockets.exceptions import ConnectionClosed
 # Set up logging
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(levelname)s - %(message)s')
-stream_logger = logging.getLogger(__name__)
+stream_logger = logging.getLogger("stream_server")
 
 
 class BaseStreamServer:

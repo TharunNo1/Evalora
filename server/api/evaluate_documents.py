@@ -17,7 +17,6 @@ import shutil
 from typing import List, Optional
 from fastapi.responses import JSONResponse
 from fastapi_mail import FastMail, MessageSchema, ConnectionConfig
-# import whisper
 import base64
 from utils.doc_utils import extract_text_pdf, extract_text_ppt
 from utils.audio_utils import get_audio_base64
@@ -26,7 +25,6 @@ from models.gemini_client import GeminiClient
 from services.gcs_service import GCSService
 from services.gmail_service import GmailService
 
-# whisper_model = whisper.load_model("base")
 
 USE_GPT_STT = False
 
@@ -136,6 +134,7 @@ Capture these structured fields:
     # Store user message
     conv["messages"].append({"role": "user", "content": user_msg})
 
+    client = OpenAI()
     # Call LLM (OpenAI example – swap model if using Mistral/LLaMA)
     response = client.chat.completions.create(
         model="gpt-4o-mini",
