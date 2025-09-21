@@ -2,7 +2,10 @@ import 'dart:ui';
 import '../upload/upload_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import "package:client/screens/session/session_list_screen.dart";
+import 'package:client/screens/session/session_list_screen.dart';
+// Import your auth provider (adjust path accordingly)
+import 'package:client/screens/auth/auth_provider.dart';
+import '../auth/sign_in_screen.dart';
 
 class DummyStartup {
   final int id;
@@ -62,7 +65,96 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             },
             icon: const Icon(Icons.upload),
           ),
+          Consumer(
+            builder: (context, ref, _) {
+              final user = ref.watch(authProvider).currentUser;
+              if (user == null) return const SizedBox.shrink();
 
+              return PopupMenuButton<String>(
+                offset: const Offset(0, 48),
+                shape:
+                    RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                tooltip: 'Account',
+                onSelected: (value) async {
+                  if (value == 'profile') {
+                    // Show profile dialog
+                    showDialog(
+                      context: context,
+                      builder: (_) => AlertDialog(
+                        title: Text(user.displayName ?? 'No Name'),
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (user.photoURL != null)
+                              CircleAvatar(
+                                backgroundImage: NetworkImage(user.photoURL!),
+                                radius: 40,
+                              ),
+                            const SizedBox(height: 12),
+                            Text('Email: ${user.email ?? 'No Email'}'),
+                          ],
+                        ),
+                        actions: [
+                          TextButton(
+                              onPressed: () => Navigator.of(context).pop(),
+                              child: const Text('Close')),
+                        ],
+                      ),
+                    );
+                  } else if (value == 'logout') {
+                    // Call your logout method from authProvider
+                    await ref.read(authProvider).signOut();
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (context) => const SignInScreen()),
+                      (route) => false,
+                    );
+                  }
+                },
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    value: 'profile',
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        backgroundImage: user.photoURL != null
+                            ? NetworkImage(user.photoURL!)
+                            : null,
+                        child:
+                            user.photoURL == null ? const Icon(Icons.person) : null,
+                      ),
+                      title: Text(user.displayName ?? ''),
+                      subtitle: Text(user.email ?? ''),
+                    ),
+                  ),
+                  const PopupMenuDivider(),
+                  const PopupMenuItem(
+                    value: 'logout',
+                    child: ListTile(
+                      leading: Icon(Icons.logout),
+                      title: Text('Logout'),
+                    ),
+                  ),
+                ],
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      backgroundImage: user.photoURL != null
+                          ? NetworkImage(user.photoURL!)
+                          : null,
+                      child:
+                          user.photoURL == null ? const Icon(Icons.person) : null,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      user.displayName ?? '',
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                    const Icon(Icons.arrow_drop_down, color: Colors.white),
+                    const SizedBox(width: 8),
+                  ],
+                ),
+              );
+            },
+          ),
         ],
       ),
       body: SingleChildScrollView(
@@ -70,7 +162,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           child: Container(
             margin: const EdgeInsets.all(36),
             padding: const EdgeInsets.all(40),
-            constraints: BoxConstraints(maxWidth: 700),
+            constraints: const BoxConstraints(maxWidth: 700),
             decoration: BoxDecoration(
               color: Colors.blueGrey.shade50,
               borderRadius: BorderRadius.circular(36),
@@ -105,7 +197,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 ),
                 const SizedBox(height: 60),
                 Container(
-                  padding: const EdgeInsets.symmetric(vertical: 34, horizontal: 32),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 34, horizontal: 32),
                   decoration: BoxDecoration(
                     color: Colors.blueGrey.shade100,
                     borderRadius: BorderRadius.circular(32),
@@ -202,42 +295,9 @@ class _CategoryFilteredScreenState extends ConsumerState<CategoryFilteredScreen>
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            if (subCategories.isNotEmpty)
-              Row(
-                children: [
-                  Expanded(
-                    flex: 3,
-                    child: DropdownButton<String?>(
-                      value: selectedSubCategory,
-                      hint: const Text('Filter by subcategory'),
-                      isExpanded: true,
-                      items: dropdownItems.map((subCat) {
-                        return DropdownMenuItem<String?>(
-                          value: subCat,
-                          child: Text(subCat ?? 'All Subcategories'),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          selectedSubCategory = value;
-                        });
-                      },
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    flex: 1,
-                    child: IconButton(
-                      icon: const Icon(Icons.filter_list),
-                      onPressed: () {
-                        // optional: show more filter options
-                      },
-                      tooltip: 'Filter options',
-                    ),
-                  ),
-                ],
-              ),
             if (subCategories.isNotEmpty) const SizedBox(height: 12),
+
+// Combined search bar and filter button
             SizedBox(
               height: 48,
               child: Row(
@@ -250,7 +310,8 @@ class _CategoryFilteredScreenState extends ConsumerState<CategoryFilteredScreen>
                         prefixIcon: const Icon(Icons.search),
                         border: OutlineInputBorder(),
                         isDense: true,
-                        contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                        contentPadding:
+                            const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                       ),
                       onChanged: (value) {
                         setState(() {
@@ -259,13 +320,49 @@ class _CategoryFilteredScreenState extends ConsumerState<CategoryFilteredScreen>
                       },
                     ),
                   ),
-                  // You can add other widgets here besides search box
-                  // For now, empty for alignment
                   const SizedBox(width: 8),
+                  Expanded(
+                    flex: 1,
+                    child: ElevatedButton.icon(
+                      onPressed: () async {
+                        final selected = await showModalBottomSheet<String?>(
+                          context: context,
+                          shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.vertical(top: Radius.circular(18))),
+                          builder: (context) {
+                            final List<String?> subCatOptions = [null, ...subCategories];
+                            return ListView(
+                              shrinkWrap: true,
+                              children: subCatOptions.map((subCat) {
+                                return ListTile(
+                                  title: Text(subCat ?? 'All Subcategories'),
+                                  onTap: () => Navigator.pop(context, subCat),
+                                  selected: selectedSubCategory == subCat,
+                                );
+                              }).toList(),
+                            );
+                          },
+                        );
+                        if (selected != null || selectedSubCategory != null) {
+                          setState(() {
+                            selectedSubCategory = selected;
+                          });
+                        }
+                      },
+                      icon: const Icon(Icons.filter_list),
+                      label: Text(selectedSubCategory ?? 'All'),
+                      style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(vertical: 14),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
+
             const SizedBox(height: 18),
+
             Expanded(
               child: filteredList.isEmpty
                   ? const Center(child: Text("No results found"))

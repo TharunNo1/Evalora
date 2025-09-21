@@ -51,10 +51,14 @@ class AuthNotifier extends ChangeNotifier {
   }
 
   Future<void> signOut() async {
-    await _auth.signOut();
-    currentUser = null;
-    notifyListeners();
-  }
+  await googleSignIn.disconnect();  // Clear Google session & revoke permissions
+  await googleSignIn.signOut();     // Sign out GoogleSignIn
+  await _auth.signOut();              // Sign out Firebase Auth
+
+  currentUser = null;
+  notifyListeners();
+}
+
 }
 
 // Provide AuthNotifier
