@@ -18,13 +18,13 @@ from typing import List, Optional
 from fastapi.responses import JSONResponse
 from fastapi_mail import FastMail, MessageSchema, ConnectionConfig
 import base64
-from utils.doc_utils import extract_text_pdf, extract_text_ppt
+from utils.doc_utils import extract_text
 from utils.audio_utils import get_audio_base64
 from utils.session_utils import get_session, save_session, session_file
 from models.gemini_client import GeminiClient
 from services.gcs_service import GCSService
 from services.gmail_service import GmailService
-
+from typing import Dict
 
 USE_GPT_STT = False
 
@@ -40,7 +40,7 @@ os.makedirs(SESSION_DIR, exist_ok=True)
 
 router = APIRouter()
 
-gmailService = GmailService()
+# gmailService = GmailService()
 
 # Memory of collected info per session
 conversations = {}
@@ -206,17 +206,40 @@ async def export_data(session_id: str, format: str):
 
     return {"error": "Invalid format"}
 
-def send_email(to, subject, body, sender="evalora@gmail.com"):
-    gmailService.send_email(to, subject, body, sender)
+# def send_email(to, subject, body, sender="evalora@gmail.com"):
+#     gmailService.send_email(to, subject, body, sender)
 
 async def evaluate_startup_documents(uploaded_files, founder_name, founder_email, startup_name, request_id):
     docs = dict()
-    for topic, file_path in uploaded_files.items():
-        if file_path.endswith(".pdf"):
-            text = extract_text_pdf(file_path)
-        elif file_path.endswith((".ppt", ".pptx")):
-            text = extract_text_ppt(file_path)
-        docs[topic] = text
+
+    for topic, file_paths in uploaded_files.items():
+        # Ensure file_paths is always a list
+        if not isinstance(file_paths, list):
+            file_paths = [file_paths]
+
+        text_combined = ""
+        for file_path in file_paths:
+            if file_path.endswith(".pdf"):
+                text_combined += extract_text(file_path) + "\n"
+            elif file_path.endswith((".ppt", ".pptx")):
+                text_combined += extract_text(file_path) + "\n"
+            elif file_path.endswith(".txt"):
+                text_combined += extract_text(file_path) + "\n"
+            elif file_path.endswith((".doc", ".docx")):
+                text_combined += extract_text(file_path) + "\n"
+            elif file_path.endswith((".eml")):
+                text_combined += extract_text(file_path) + "\n"
+            elif file_path.endswith((".mp3", ".wav", ".m4a")):
+                text_combined += extract_text(file_path) + "\n"
+            elif file_path.endswith(".mp4"):
+                text_combined += extract_text(file_path) + "\n"
+            else:
+                # fallback
+                text_combined += f"[Unsupported file type: {file_path}]\n"
+            os.remove(file_path)  # Clean up temp file after processing
+
+        docs[topic] = text_combined
+
     
     summary = await geminiClient.analyze_documents(request_id=request_id,founder_name=founder_name,founder_email=founder_email,startup_name=startup_name,docs=docs)
 
@@ -225,82 +248,103 @@ async def evaluate_startup_documents(uploaded_files, founder_name, founder_email
     with open(summary_path, "w") as f:
         f.write(summary)
 
-    gcsService.upload_file(open(summary_path, "rb"), f"summaries/{request_id}.txt", content_type="text/plain")
-    # Clean up temp files
-    for f in uploaded_files.values():
-        os.remove(f)
+    gcsService.upload_file(open(summary_path, "rb"), f"summaries/{request_id}/founder_summary_{request_id}.md", content_type="text/plain")
+
+        
     
-@router.post("/analyze-documents")
+@router.post("/analyze-documents/")
 async def analyze_documents(
     background_tasks: BackgroundTasks,
+    request: Request,
     request_id: str = Form(...),
     founder_name: str = Form(...),
     founder_email: str = Form(...),
     startup_name: str = Form(...),
-    founderChecklist: Optional[UploadFile] = File(None),
-    pitchDeck: Optional[UploadFile] = File(None),
-    otherDoc1: Optional[UploadFile] = File(None),
-    otherDoc2: Optional[UploadFile] = File(None),
+    founderChecklist: Optional[UploadFile] = File(None)
 ):
     """
-    Receives documents and founder/startup info, then analyzes them.
+    Accepts founder/startup info and a flexible set of uploaded files:
+      - founderChecklist (single)
+      - pitchDeck0..n  (multiple)
+      - emailMessages  (multiple)
+      - callRecordings (multiple)
+      - callTranscripts (multiple)
+    All files are stored to disk and queued for background evaluation.
     """
-    uploaded_files = dict()
+    os.makedirs(UPLOAD_DIR, exist_ok=True)
+    uploaded_files: Dict[str, List[str]] = {
+        "founderChecklist": [],
+        "pitchDeck": [],
+        "emailMessages": [],
+        "callRecordings": [],
+        "callTranscripts": [],
+    }
 
+    # ---------- 1️⃣ Save checklist (if any) ----------
     if founderChecklist:
-        temp_path = UPLOAD_DIR + "/" + f"temp_{founderChecklist.filename}"
-        with open(temp_path, "wb") as buffer:
+        checklist_path = os.path.join(
+            UPLOAD_DIR, f"temp_{founderChecklist.filename}"
+        )
+        with open(checklist_path, "wb") as buffer:
             shutil.copyfileobj(founderChecklist.file, buffer)
-        uploaded_files["founderChecklist"] = temp_path 
-    
-    if pitchDeck:
-        temp_path = UPLOAD_DIR + "/" +  f"temp_{pitchDeck.filename}"
-        with open(temp_path, "wb") as buffer:
-            shutil.copyfileobj(pitchDeck.file, buffer)
-        uploaded_files["pitchDeck"] = temp_path 
-    
-    if otherDoc1:
-        temp_path = UPLOAD_DIR + "/" +  f"temp_{otherDoc1.filename}"
-        with open(temp_path, "wb") as buffer:
-            shutil.copyfileobj(otherDoc1.file, buffer)
-        uploaded_files["otherDoc1"] = temp_path 
-    
-    if otherDoc2:
-        temp_path = UPLOAD_DIR + "/" +  f"temp_{otherDoc2.filename}"
-        with open(temp_path, "wb") as buffer:
-            shutil.copyfileobj(otherDoc2.file, buffer)
-        uploaded_files["otherDoc2"] = temp_path 
+        uploaded_files["founderChecklist"].append(checklist_path)
 
-    
-    # 1️⃣ Send email confirmation to founder
-    email_content = f"Dear {founder_name},\n\nYour request has been submitted successfully.\nNote fown the Request ID: {request_id} for further reference.\n\n You will be invited for evaluation after reviewal of your documents. \n\n Thanks & Regards, \nEvalora team",
+    # ---------- 2️⃣ Save dynamic pitch decks ----------
+    form = await request.form()
+    for key, value in form.multi_items():
+        # pitchDeck0, pitchDeck1...
+        if key.startswith("pitchDeck") and isinstance(value, UploadFile):
+            temp_path = os.path.join(UPLOAD_DIR, f"temp_{value.filename}")
+            with open(temp_path, "wb") as buffer:
+                shutil.copyfileobj(value.file, buffer)
+            uploaded_files["pitchDeck"].append(temp_path)
 
-    background_tasks.add_task(
-        send_email,
-        founder_email,
-        "Evalora Document Request Received for StartUp: " + startup_name,
-        email_content,
-        "evaloraofficial@gmail.com"
+    # ---------- 3️⃣ Save grouped files ----------
+    async def save_multiple(prefix: str):
+        files: List[UploadFile] = await request.form().then(
+            lambda f: f.getlist(prefix)
+        )  # FastAPI does not support getlist directly on Request
+        return files
+
+    # Since Flutter adds them via addFilesToFormData(), we must iterate manually:
+    for field in ["emailMessages", "callRecordings", "callTranscripts"]:
+        for key, value in form.multi_items():
+            if key == field and isinstance(value, UploadFile):
+                temp_path = os.path.join(UPLOAD_DIR, f"temp_{value.filename}")
+                with open(temp_path, "wb") as buffer:
+                    shutil.copyfileobj(value.file, buffer)
+                uploaded_files[field].append(temp_path)
+
+    # ---------- 4️⃣ Background tasks ----------
+    email_content = (
+        f"Dear {founder_name},\n\n"
+        f"Your request has been submitted successfully.\n"
+        f"Request ID: {request_id}\n\n"
+        f"Our team will review your documents shortly.\n\n"
+        f"Regards,\nEvalora Team"
     )
 
-    # 2️⃣ Add background task to process documents & LLM
+    # background_tasks.add_task(
+    #     send_email,
+    #     founder_email,
+    #     f"Evalora Document Request – {startup_name}",
+    #     email_content,
+    #     "evaloraofficial@gmail.com",
+    # )
+
     background_tasks.add_task(
         evaluate_startup_documents,
         uploaded_files,
         founder_name,
         founder_email,
         startup_name,
-        request_id
+        request_id,
     )
 
-     # 3️⃣ Return immediate response
-    return {"message": "Request submitted successfully!", 
-            "request_id": request_id,
+    return {
+        "message": "Request submitted successfully!",
+        "request_id": request_id,
         "founder_name": founder_name,
-        "files": {
-            "checklist": founderChecklist.filename if founderChecklist else None,
-            "pitch": pitchDeck.filename if pitchDeck else None,
-            "other1": otherDoc1.filename if otherDoc1 else None,
-            "other2": otherDoc2.filename if otherDoc2 else None,
-        }}
-
+        "uploaded": {k: [os.path.basename(p) for p in v]
+                     for k, v in uploaded_files.items()},
+    }

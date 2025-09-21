@@ -28,9 +28,17 @@ class GeminiClient:
         Builds structured prompt for Gemini model.
         """
         return f"""
-You are analyzing startup founder documents (pitch deck & checklist). Provide the following template completely filled with necessary details grounded as per documents data:
+You are analyzing startup founder documents (pitch deck & checklist). Provide the following template completely filled with necessary details grounded as per documents data and also provide score as per guidelines:
+
+Guidelines for scoring:
+- Complete Information (Score: 5): All required information is present, detailed, and accurate.
+- Mostly Complete (Score: 4): Most information is present, minor details are missing.
+- Partial Information (Score: 3): Some key information is missing or incomplete.
+- Minimal Information (Score: 2): Very limited information, several important details missing.
+- No Information (Score: 1): Required information is completely missing.
 
 # COMPREHENSIVE INVESTOR-READY BUSINESS PLAN
+EVALORA_SCORE: XX (Out of 5)
 
 request_id: {request_id}
 founder_name: {founder_name}
@@ -710,14 +718,16 @@ This business plan contains confidential and proprietary information. Any reprod
 *This comprehensive business plan template is designed to meet institutional investor requirements and due diligence standards. Each section should be thoroughly completed with specific, measurable data and realistic projections based on solid market research and financial analysis.*
 
     Here are the contents of various documents:
-######## Founder Checklist: ###########
+######## Founder Checklists: ###########
     {docs.get("founderChecklist", "Not Available")}
 ######## Pitch deck: ###########
     {docs.get("pitchDeck", "Not Available")}
-######## Additional Document 1: ###########
-    {docs.get("otherDoc1", "Not Applicable")}
-######## Additional Document 2: ###########
-   {docs.get("otherDoc2", "Not Applicable")}
+######## Email messages: ###########
+    {docs.get("emailMessages", "Not Applicable")}
+######## Call Recordings: ###########
+    {docs.get("callRecordings", "Not Applicable")}
+######## Call Transcripts: ###########
+    {docs.get("callTranscripts", "Not Applicable")}
 
     """
  
