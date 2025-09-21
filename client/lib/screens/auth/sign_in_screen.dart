@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../auth/auth_provider.dart';
 import '../dashboard/dashboard_screen.dart';
 import '../../widgets/input_text.dart';
+import 'sign_up_screen.dart';
 
 class SignInScreen extends ConsumerStatefulWidget {
   const SignInScreen({super.key});
@@ -19,15 +20,20 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       body: Center(
         child: Container(
           padding: const EdgeInsets.all(24),
-          constraints: const BoxConstraints(maxWidth: 460),
+          constraints: const BoxConstraints(maxWidth: 470),
           child: Card(
             elevation: 15,
-            color: Colors.white,
+            color: Colors.black,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(32),
+              side: const BorderSide(
+                color: Colors.white,
+                width: 2,
+              ),
             ),
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 28),
@@ -35,37 +41,46 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const SizedBox(height: 4),
-                  Text(
+                  const Text(
                     'Welcome to Evalora',
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.5,
-                          color: Colors.blueGrey.shade800,
-                        ),
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.5,
+                      color: Colors.white,
+                      fontSize: 24,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 30),
                   InputText(
                     controller: usernameController,
                     hint: 'Email or username',
+                    textStyle: const TextStyle(color: Colors.white),
+                    borderColor: Colors.white,
+                    fillColor: Colors.black,
+                    hintStyle: const TextStyle(color: Colors.white70),
                   ),
                   const SizedBox(height: 16),
                   InputText(
                     controller: passwordController,
                     hint: 'Password',
                     obscure: true,
+                    textStyle: const TextStyle(color: Colors.white),
+                    borderColor: Colors.white,
+                    fillColor: Colors.black,
+                    hintStyle: const TextStyle(color: Colors.white70),
                   ),
                   const SizedBox(height: 20),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 16,
-                        ),
-                        backgroundColor: Colors.blueGrey.shade900,
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.black,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(21),
+                          side: const BorderSide(color: Colors.white, width: 2),
                         ),
                         elevation: 6,
                       ),
@@ -94,7 +109,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                                       e.toString(),
                                       style: const TextStyle(fontSize: 15),
                                     ),
-                                    backgroundColor: Colors.red.shade400,
+                                    backgroundColor: Colors.red.shade700,
                                   ),
                                 );
                               } finally {
@@ -109,7 +124,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                               width: 20,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2.5,
-                                color: Colors.white,
+                                color: Colors.black,
                               ),
                             )
                           : const Text(
@@ -118,33 +133,36 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                                 fontWeight: FontWeight.w600,
                                 fontSize: 17,
                                 letterSpacing: 0.15,
+                                color: Colors.black,
                               ),
                             ),
                     ),
                   ),
                   const SizedBox(height: 18),
                   Row(
-                    children: [
+                    children: const [
                       Expanded(
-                          child: Divider(
-                        thickness: 1.0,
-                        color: Colors.blueGrey.shade200,
-                      )),
+                        child: Divider(
+                          thickness: 1.0,
+                          color: Colors.white,
+                        ),
+                      ),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        padding: EdgeInsets.symmetric(horizontal: 12),
                         child: Text(
                           "or",
                           style: TextStyle(
-                            color: Colors.blueGrey.shade400,
+                            color: Colors.white,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
                       ),
                       Expanded(
-                          child: Divider(
-                        thickness: 1.0,
-                        color: Colors.blueGrey.shade200,
-                      )),
+                        child: Divider(
+                          thickness: 1.0,
+                          color: Colors.white,
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 18),
@@ -152,20 +170,19 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                     width: double.infinity,
                     child: OutlinedButton.icon(
                       style: OutlinedButton.styleFrom(
-                        side: BorderSide(
-                          color: Colors.blueGrey.shade300,
-                        ),
+                        side: const BorderSide(color: Colors.white, width: 2),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(21),
                         ),
                       ),
-                      icon: const Icon(Icons.login, color: Color(0xFF4285F4)),
+                      icon: const Icon(Icons.login, color: Colors.white),
                       label: const Text(
                         "Sign in with Google",
                         style: TextStyle(
                           fontWeight: FontWeight.w500,
                           fontSize: 16,
+                          color: Colors.white,
                         ),
                       ),
                       onPressed: loading
@@ -187,7 +204,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     content: Text(e.toString()),
-                                    backgroundColor: Colors.red.shade400,
+                                    backgroundColor: Colors.red.shade700,
                                   ),
                                 );
                               } finally {
@@ -197,6 +214,34 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                               }
                             },
                     ),
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        "Don't have an account?",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(builder: (_) => const SignUpScreen()),
+                          );
+                        },
+                        child: const Text(
+                          "Sign up",
+                          style: TextStyle(
+                            color: Colors.lightBlueAccent,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
