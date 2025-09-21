@@ -34,10 +34,16 @@ class AuthNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> signUp(String email, String password) async {
+  Future<UserCredential> signUp(String email, String password) async {
     final userCredential = await _auth.createUserWithEmailAndPassword(email: email, password: password);
     currentUser = userCredential.user;
     notifyListeners();
+    return userCredential;
+  }
+
+   Future<void> refreshUser() async {
+    await _auth.currentUser?.reload();
+    currentUser = _auth.currentUser;
   }
 
   Future<void> signInWithGoogle() async {

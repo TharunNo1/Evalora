@@ -149,17 +149,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     ),
   ];
 
-  final Map<String, List<String>> subCategoriesMap = {
-    "technology": ["AI", "Blockchain", "Cloud", "VR/AR", "IoT"],
-    "industry": [
-      "Manufacturing",
-      "Retail",
-      "Healthcare",
-      "Finance",
-      "Logistics"
-    ]
-  };
-
   @override
   Widget build(BuildContext context) {
     final totalIdeas = startups.length.toString();

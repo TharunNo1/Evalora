@@ -1,5 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:universal_html/html.dart';
 import '../auth/auth_provider.dart';
 import '../dashboard/dashboard_screen.dart';
 import '../../widgets/input_text.dart';
@@ -138,13 +140,15 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                               setState(() => loading = true);
                               try {
                                 // Register user with email and password
-                                await ref.read(authProvider.notifier).signUp(email, password);
+                                final credential = ref.read(authProvider.notifier).signUp(email, password);
 
                                 // Optionally, update displayName on Firebase User
-                                var currentUser = ref.read(authProvider).currentUser;
+                                var currentUser = ref.read(authProvider.notifier).currentUser  ;
                                 if (currentUser != null) {
                                   await currentUser.updateDisplayName(name);
                                   await currentUser.reload();
+                                   // Make sure provider reflects updated user
+  ref.read(authProvider.notifier).refreshUser();
                                 }
 
                                 if (ref.read(authProvider) != null) {
