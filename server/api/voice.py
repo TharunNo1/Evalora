@@ -3,9 +3,8 @@ import asyncio
 import tempfile
 import uuid
 from typing import Dict
-from fastapi import FastAPI, Request, APIRouter
-from pydantic import BaseModel
-from aiortc import RTCPeerConnection, RTCSessionDescription, MediaStreamTrack
+from fastapi import APIRouter
+from aiortc import RTCPeerConnection, RTCSessionDescription
 from aiortc.contrib.media import MediaPlayer, MediaRecorder
 from gtts import gTTS
 from schemas.voice import OfferRequest

@@ -12,9 +12,7 @@ openpyxl
 reportlab
 python-pptx
 gtts 
-openai
 fastapi-mail
-whisper
 python-multipart
 google-auth 
 google-auth-oauthlib 
@@ -23,14 +21,11 @@ google-api-python-client>=2.90.0,<3
 aiohttp 
 aiortc==1.13.0
 pydub
-fitz 
-PyMuPDF
 google-cloud-storage>=2.16.0
 tools
 google-generativeai==0.8.4
 PyMuPDF
 pdfminer.six==20221105
-python-pptx
 python-docx
 mammoth
 extract-msg
@@ -42,3 +37,5 @@ chardet
 frontend
 pdfplumber
 gunicorn>=21.2.0
+PyMuPDF
+openai

@@ -108,7 +108,7 @@ class _UploadScreenState extends State<UploadScreen> {
       await addFilesToFormData("callTranscripts", callTranscripts, formData);
 
       final response = await dio.post(
-        "http://127.0.0.1:8000/analyze-documents/",
+        "https://evalora-service-158695644143.asia-south1.run.app/analyze-documents/",
         data: formData,
         options: Options(contentType: 'multipart/form-data'),
       );

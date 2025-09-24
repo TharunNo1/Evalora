@@ -1,0 +1,12 @@
+__pycache__
+*.pyc
+.git
+tests
+data/
+.venv/
+.venv2/
+*__pycache__*
+summaries/*
+uploads/*
+*.json
+secrets/*

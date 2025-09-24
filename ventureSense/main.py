@@ -5,6 +5,7 @@ from fastapi.responses import HTMLResponse
 from models.stream_service import StreamingService 
 from vertexai import init
 import os 
+import firebase.functions as functions
 
 from dotenv import load_dotenv
 
@@ -31,8 +32,6 @@ async def startup_event():
     """
     Start the internal ADK streaming server tasks when FastAPI boots.
     """
-
-    
     init(project=PROJECT_ID, location=LOCATION)
 
 @app.websocket("/ws/stream")
@@ -59,8 +58,8 @@ async def websocket_endpoint(websocket: WebSocket):
 @app.get("/")
 async def index():
     return HTMLResponse(
-        "<h2>Google ADK Voice Streaming Service</h2>"
-        "<p>Connect to <code>/ws/stream</code> via WebSocket.</p>"
+        "<h2>Evalora Backend Service/h2>"
+        "<p>Connect to Investors</p>"
     )
 
-
+firebase_function = functions.https.on_request(app)

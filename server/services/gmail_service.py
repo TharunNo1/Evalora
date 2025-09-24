@@ -1,5 +1,4 @@
 import os
-import json
 import base64
 from email.mime.text import MIMEText
 

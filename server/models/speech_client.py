@@ -2,6 +2,7 @@ from google.cloud import speech
 from google.oauth2 import service_account
 from dotenv import load_dotenv
 from pathlib import Path
+from google.auth import default
 
 
 class GoogleSpeechClient:
@@ -18,10 +19,13 @@ class GoogleSpeechClient:
             scopes (list, optional): OAuth scopes. Defaults to ["https://www.googleapis.com/auth/cloud-platform"].
         """
         load_dotenv()
-        self.credentials_path = Path(credentials_path)
+        # self.credentials_path = Path(credentials_path)
         self.scopes = scopes or ["https://www.googleapis.com/auth/cloud-platform"]
-        self.credentials = self._load_credentials()
+        # Automatically uses Cloud Run service account credentials
+        self.credentials, _ = default(scopes=["https://www.googleapis.com/auth/cloud-platform"])
         self.client = speech.SpeechClient(credentials=self.credentials)
+        # self.credentials = self._load_credentials()
+        # self.client = speech.SpeechClient(credentials=self.credentials)
         print(f"✅ Using service account: {self.credentials.service_account_email}")
 
     def _load_credentials(self):

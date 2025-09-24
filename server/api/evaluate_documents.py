@@ -1,5 +1,5 @@
 from fastapi import Request, UploadFile, File, WebSocket, WebSocketDisconnect, APIRouter, BackgroundTasks, Form
-from fastapi.middleware.cors import CORSMiddleware
+# from fastapi.middleware.cors import CORSMiddleware
 import json
 from openai import OpenAI
 from docx import Document
@@ -7,23 +7,23 @@ from openpyxl import Workbook
 from reportlab.platypus import SimpleDocTemplate, Paragraph
 from reportlab.lib.styles import getSampleStyleSheet
 import os
-import tempfile
+# import tempfile
 from gtts import gTTS
-import base64 
+# import base64 
 from pptx import Presentation
-import fitz  # PyMuPDF
+# import fitz  # PyMuPDF
 import os
 import shutil
 from typing import List, Optional
-from fastapi.responses import JSONResponse
-from fastapi_mail import FastMail, MessageSchema, ConnectionConfig
+# from fastapi.responses import JSONResponse
+# from fastapi_mail import FastMail, MessageSchema, ConnectionConfig
 import base64
 from utils.doc_utils import extract_text
 from utils.audio_utils import get_audio_base64
 from utils.session_utils import get_session, save_session, session_file
 from models.gemini_client import GeminiClient
 from services.gcs_service import GCSService
-from services.gmail_service import GmailService
+# from services.gmail_service import GmailService
 from typing import Dict
 
 USE_GPT_STT = False

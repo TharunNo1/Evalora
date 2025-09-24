@@ -1,4 +1,4 @@
-import fitz # PyMuPDF
+# import fitz # PyMuPDF
 from pptx import Presentation   
 import os
 import logging
