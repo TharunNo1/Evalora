@@ -1,6 +1,5 @@
 import 'dart:io' show File;
 import 'dart:typed_data';
-
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -18,8 +17,11 @@ class _UploadScreenState extends State<UploadScreen> {
 
   late String requestId;
   String startupName = "";
+  String description = "";
   String founderName = "";
   String founderEmail = "";
+  String technologiesUsed = "";
+  String industryDomains = "";
 
   PlatformFile? checklistFile; // Single file category
   List<PlatformFile> pitchDeckFiles = [];
@@ -83,6 +85,9 @@ class _UploadScreenState extends State<UploadScreen> {
         MapEntry("founder_name", founderName),
         MapEntry("founder_email", founderEmail),
         MapEntry("startup_name", startupName),
+        MapEntry("description", description),
+        MapEntry("technology_subcategories", technologiesUsed),
+        MapEntry("industry_subcategories", industryDomains),
       ]);
 
       if (checklistFile != null) {
@@ -108,7 +113,8 @@ class _UploadScreenState extends State<UploadScreen> {
       await addFilesToFormData("callTranscripts", callTranscripts, formData);
 
       final response = await dio.post(
-        "https://evalora-service-158695644143.asia-south1.run.app/analyze-documents/",
+        // "https://evalora-service-158695644143.asia-south1.run.app/analyze-documents/",
+        "http://127.0.0.1:8000/analyze-documents/",
         data: formData,
         options: Options(contentType: 'multipart/form-data'),
       );
@@ -117,8 +123,11 @@ class _UploadScreenState extends State<UploadScreen> {
         summary = response.data['summary'];
         requestId = _generateRequestId();
         startupName = "";
+        description = "";
         founderName = "";
         founderEmail = "";
+        technologiesUsed = "";
+        industryDomains = ""; 
         checklistFile = null;
         pitchDeckFiles = [];
         emailMessages = [];
@@ -173,17 +182,19 @@ class _UploadScreenState extends State<UploadScreen> {
       keyboardType: keyboardType,
       validator: (v) {
         if (v == null || v.isEmpty) return "Required";
-        if (label == "Founder Email ID" && !v.contains("@")) return "Invalid email";
+        if (label == "Founder Email ID" && !v.contains("@"))
+          return "Invalid email";
         return null;
       },
     );
   }
 
-  Widget _fileChip(
-          PlatformFile file, IconData icon, Color color, VoidCallback onDelete) =>
+  Widget _fileChip(PlatformFile file, IconData icon, Color color,
+          VoidCallback onDelete) =>
       Chip(
         avatar: CircleAvatar(
-            backgroundColor: color, child: Icon(icon, color: Colors.white, size: 16)),
+            backgroundColor: color,
+            child: Icon(icon, color: Colors.white, size: 16)),
         label: Text(file.name, overflow: TextOverflow.ellipsis),
         deleteIcon: Icon(Icons.close, size: 18),
         onDeleted: onDelete,
@@ -216,8 +227,8 @@ class _UploadScreenState extends State<UploadScreen> {
                 icon: Icon(Icons.upload_file, color: Colors.white),
                 label: Text("Upload", style: TextStyle(color: Colors.white)),
                 style: ElevatedButton.styleFrom(
-                  shape:
-                      RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(32)),
                   backgroundColor: color,
                   padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 ),
@@ -242,7 +253,6 @@ class _UploadScreenState extends State<UploadScreen> {
                 ),
               ),
             ),
-
             if (files.isEmpty)
               Padding(
                 padding: const EdgeInsets.only(top: 12),
@@ -260,7 +270,8 @@ class _UploadScreenState extends State<UploadScreen> {
                   children: files
                       .map((f) => _fileChip(f, icon, color, () {
                             setState(() {
-                              var updatedList = files.where((file) => file != f).toList();
+                              var updatedList =
+                                  files.where((file) => file != f).toList();
                               onFilesChanged(updatedList);
                             });
                           }))
@@ -273,8 +284,38 @@ class _UploadScreenState extends State<UploadScreen> {
     );
   }
 
+ 
   @override
   Widget build(BuildContext context) {
+    List<String> technologyOptions = [
+      "Artificial Intelligence",
+      "Machine Learning",
+      "Data Analytics",
+      "Cloud Computing",
+      "Blockchain",
+      "Cybersecurity",
+      "Internet of Things (IoT)",
+      "Augmented Reality (AR)",
+      "Virtual Reality (VR)",
+      "Robotics"
+    ]; // e.g. ["AI", "Blockchain", ...]
+    List<String> industryOptions = [
+      "Fintech",
+      "Healthcare",
+      "Renewable Energy",
+      "Carbon Management",
+      "Green Manufacturing",
+      "Logistics",
+      "Supply Chain",
+      "Corporate Training",
+      "Power Distribution",
+      "E-Commerce"
+    ]; // e.g. ["Healthcare", "Fintech", ...]
+
+    Set<String> selectedTechnology = {};
+    Set<String> selectedIndustry = {};
+
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Evaluation Request Submission"),
@@ -295,12 +336,29 @@ class _UploadScreenState extends State<UploadScreen> {
               SizedBox(height: 24),
               _buildTextField("Startup Name", (v) => startupName = v ?? ""),
               SizedBox(height: 16),
+              _buildTextField(
+                  "Startup Description", (v) => description = v ?? "",
+                  keyboardType: TextInputType.text),
+              SizedBox(height: 16),
               _buildTextField("Founder Name", (v) => founderName = v ?? ""),
               SizedBox(height: 16),
               _buildTextField("Founder Email ID", (v) => founderEmail = v ?? "",
                   keyboardType: TextInputType.emailAddress),
-              SizedBox(height: 32),
-
+              SizedBox(height: 16),
+            
+              Row(
+      children: [
+        Expanded(
+          child:  _buildTextField("Technologies used (Comma separated)", (v) => technologiesUsed = v ?? ""),
+        ),
+        SizedBox(width: 16),
+        Expanded(
+          child:  _buildTextField("Industry domains (Comma separated)", (v) => industryDomains = v ?? ""),
+        ),
+      ],
+    ),
+              
+    SizedBox(height: 32),
               _uploadSection(
                 "Upload Checklist (PDF)",
                 Icons.picture_as_pdf,
@@ -356,7 +414,6 @@ class _UploadScreenState extends State<UploadScreen> {
                   callTranscripts = files;
                 },
               ),
-
               SizedBox(height: 40),
               ElevatedButton(
                 onPressed: _submit,
@@ -370,11 +427,13 @@ class _UploadScreenState extends State<UploadScreen> {
                 ),
                 child: Text(
                   "Submit Request",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
                 ),
               ),
               SizedBox(height: 32),
-
               if (summary != null)
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -498,7 +557,8 @@ class _UploadDialogState extends State<UploadDialog> {
           Icon(widget.icon, color: widget.color),
           SizedBox(width: 10),
           Expanded(
-            child: Text(widget.title, style: TextStyle(fontWeight: FontWeight.bold)),
+            child: Text(widget.title,
+                style: TextStyle(fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -552,7 +612,8 @@ class _UploadDialogState extends State<UploadDialog> {
       ),
       actions: [
         TextButton(
-            onPressed: () => Navigator.of(context).pop(), child: Text("Cancel")),
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text("Cancel")),
         ElevatedButton(
           onPressed: _onUploadPressed,
           style: ElevatedButton.styleFrom(backgroundColor: widget.color),
