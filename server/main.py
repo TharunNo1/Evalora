@@ -19,8 +19,11 @@ app.add_middleware(
 )
 # Include API router
 from api.voice import router as voice_router
-app.include_router(voice_router, prefix="/api")
-
 # Include evaluate_documents router
 from api.evaluate_documents import router as evaluate_documents_router  
+# Include database router
+from api.database import router as database_router
+
+app.include_router(voice_router, prefix="/api")
 app.include_router(evaluate_documents_router)
+app.include_router(database_router)

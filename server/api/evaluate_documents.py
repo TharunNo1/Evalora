@@ -24,13 +24,17 @@ from utils.session_utils import get_session, save_session, session_file
 from models.gemini_client import GeminiClient
 from services.gcs_service import GCSService
 # from services.gmail_service import GmailService
+from datetime import datetime
 from typing import Dict
-
+from services.firestore_service import FirestoreService
+from schemas.models import EvaluationRequest, RequestStage, Startup
+import mimetypes
 USE_GPT_STT = False
 
 language = 'en'
 geminiClient = GeminiClient()  # Initialize GeminiClient when needed
 gcsService = GCSService()
+dbService = FirestoreService()
 
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
@@ -236,30 +240,45 @@ async def evaluate_startup_documents(uploaded_files, founder_name, founder_email
             else:
                 # fallback
                 text_combined += f"[Unsupported file type: {file_path}]\n"
-            os.remove(file_path)  # Clean up temp file after processing
+            # os.remove(file_path)  # Clean up temp file after processing
 
         docs[topic] = text_combined
 
     
     summary = await geminiClient.analyze_documents(request_id=request_id,founder_name=founder_name,founder_email=founder_email,startup_name=startup_name,docs=docs)
 
-    summary_path = f"summaries/{request_id}.txt"
+    summary_path = f"summaries/{startup_name}_{request_id}.txt"
     os.makedirs("summaries", exist_ok=True)
     with open(summary_path, "w") as f:
         f.write(summary)
 
-    gcsService.upload_file(open(summary_path, "rb"), f"summaries/{request_id}/founder_summary_{request_id}.md", content_type="text/plain")
+    gcsService.upload_file(open(summary_path, "rb"), f"{request_id}/summary_{startup_name}_{request_id}.md", content_type="text/plain")
 
-        
+
+def upload_dynamic_file(temp_path: str, request_id: str, folder_name: str):
+    # ✅ Guess MIME type from file extension
+    content_type, _ = mimetypes.guess_type(temp_path)
+    if content_type is None:
+        content_type = "application/octet-stream"  # fallback for unknown types
+
+    with open(temp_path, "rb") as f:
+        gcsService.upload_file(
+            f,
+            f"{request_id}/{folder_name}/{temp_path.split('/')[-1]}",  # only filename in GCS
+            content_type=content_type
+        )
     
 @router.post("/analyze-documents/")
 async def analyze_documents(
     background_tasks: BackgroundTasks,
     request: Request,
     request_id: str = Form(...),
+    description: str = Form(...),
     founder_name: str = Form(...),
     founder_email: str = Form(...),
     startup_name: str = Form(...),
+    technology_subcategories: str = Form(...),   
+    industry_subcategories: str = Form(...),    
     founderChecklist: Optional[UploadFile] = File(None)
 ):
     """
@@ -271,6 +290,17 @@ async def analyze_documents(
       - callTranscripts (multiple)
     All files are stored to disk and queued for background evaluation.
     """
+
+    categories = []
+    subcategories = {}
+    tech_list = [t.strip() for t in technology_subcategories.split(",") if t.strip()]
+    if len(tech_list) > 0:
+        categories.append("Technology")
+        subcategories["Technology"] = tech_list
+    industry_list = [i.strip() for i in industry_subcategories.split(",") if i.strip()]
+    if len(industry_list) > 0:
+        categories.append("Industry")
+        subcategories["Industry"] = industry_list
     os.makedirs(UPLOAD_DIR, exist_ok=True)
     uploaded_files: Dict[str, List[str]] = {
         "founderChecklist": [],
@@ -288,16 +318,19 @@ async def analyze_documents(
         with open(checklist_path, "wb") as buffer:
             shutil.copyfileobj(founderChecklist.file, buffer)
         uploaded_files["founderChecklist"].append(checklist_path)
+        upload_dynamic_file(checklist_path, request_id,"checklists")
 
     # ---------- 2️⃣ Save dynamic pitch decks ----------
     form = await request.form()
     for key, value in form.multi_items():
         # pitchDeck0, pitchDeck1...
         if key.startswith("pitchDeck") and isinstance(value, UploadFile):
-            temp_path = os.path.join(UPLOAD_DIR, f"temp_{value.filename}")
+            temp_path = os.path.join(UPLOAD_DIR, f"{value.filename}")
             with open(temp_path, "wb") as buffer:
                 shutil.copyfileobj(value.file, buffer)
+            gcsService.upload_file(open(temp_path, "rb"), f"{request_id}/{temp_path}", content_type="text/plain")
             uploaded_files["pitchDeck"].append(temp_path)
+            upload_dynamic_file(temp_path, request_id, "pitchDecks")
 
     # ---------- 3️⃣ Save grouped files ----------
     async def save_multiple(prefix: str):
@@ -314,6 +347,7 @@ async def analyze_documents(
                 with open(temp_path, "wb") as buffer:
                     shutil.copyfileobj(value.file, buffer)
                 uploaded_files[field].append(temp_path)
+                upload_dynamic_file(temp_path, request_id, field)
 
     # ---------- 4️⃣ Background tasks ----------
     email_content = (
@@ -340,6 +374,21 @@ async def analyze_documents(
         startup_name,
         request_id,
     )
+
+    dbService.create_evaluation_request(EvaluationRequest(startupId=request_id, startupName=startup_name, description=description, founderName=founder_name, founderEmail=founder_email, docsList=uploaded_files))
+
+    dbService.create_startup(startup=Startup(
+        id=request_id,
+        name=startup_name,
+        description=description,
+            categories=categories,
+                subCategories=subcategories,
+                founder=founder_name,
+                founder_id="",
+                score=0.0,
+                currentStatus=RequestStage.submission,
+                approved=False
+                ))
 
     return {
         "message": "Request submitted successfully!",

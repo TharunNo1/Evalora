@@ -39,3 +39,7 @@ pdfplumber
 gunicorn>=21.2.0
 PyMuPDF
 openai
+sqlalchemy 
+psycopg2 
+alembic 
+google-cloud-firestore
