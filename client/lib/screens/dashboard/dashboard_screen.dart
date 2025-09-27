@@ -130,7 +130,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
   Future<List<Startup>> fetchStartups() async {
     // 🔑 Replace with your actual backend endpoint
-    const String apiUrl = "http://127.0.0.1:8000/startups";
+    const String apiUrl = "https://evalora-service-158695644143.asia-south1.run.app/startups";
 
     final response = await http.get(Uri.parse(apiUrl));
     if (response.statusCode == 200) {

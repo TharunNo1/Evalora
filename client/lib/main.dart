@@ -60,7 +60,7 @@ class EvaloraApp extends StatelessWidget {
           Theme.of(context).textTheme,
         ),
       ),
-      home: const DashboardScreen(),
+      home: const SignInScreen(),
     );
   }
 }
