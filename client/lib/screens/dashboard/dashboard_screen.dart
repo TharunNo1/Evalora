@@ -7,6 +7,8 @@ import 'package:client/screens/auth/auth_provider.dart';
 import '../auth/sign_in_screen.dart';
 import '../re_evaluation/re_evaluation_screen.dart';
 
+// Dummy models for startups, reevaluations, and documents
+
 class DummyStartup {
   final int id;
   final String title;
@@ -23,6 +25,36 @@ class DummyStartup {
     required this.subCategories,
     required this.approved,
     required this.description,
+  });
+}
+
+class DummyDocument {
+  final String name;
+  final String type; // 'pitchdeck', 'processed', etc.
+  final String content; // For demo, stores text content or summary
+
+  DummyDocument({
+    required this.name,
+    required this.type,
+    required this.content,
+  });
+}
+
+class DummyReevaluation {
+  final int id;
+  final int startupId;
+  final String reason;
+  final DateTime requestedAt;
+  final List<DummyDocument> documents;
+  final List<String> conversationTranscripts;
+
+  DummyReevaluation({
+    required this.id,
+    required this.startupId,
+    required this.reason,
+    required this.requestedAt,
+    required this.documents,
+    required this.conversationTranscripts,
   });
 }
 
@@ -149,6 +181,33 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     ),
   ];
 
+  final List<DummyReevaluation> reevaluations = [
+    DummyReevaluation(
+      id: 1,
+      startupId: 1,
+      reason: 'Request to update the AI model details.',
+      requestedAt: DateTime.now().subtract(const Duration(days: 1)),
+      documents: [
+        DummyDocument(
+          name: "Pitchdeck.pdf",
+          type: "pitchdeck",
+          content: "Slide 1: Introduction...\nSlide 2: Tech Stack...",
+        ),
+        DummyDocument(
+          name: "Processed Document",
+          type: "processed",
+          content:
+              "SUMMARY: Leveraging neural networks for real-time decision-making. Updated modeling, reduced latency, improved outcomes.",
+        ),
+      ],
+      conversationTranscripts: [
+        "User: Please update the risk section.",
+        "Reviewer: Risks now cover data privacy.",
+      ],
+    ),
+    // Add more DummyReevaluation entries if needed
+  ];
+
   @override
   Widget build(BuildContext context) {
     final totalIdeas = startups.length.toString();
@@ -185,6 +244,20 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             },
             icon: const Icon(Icons.upload),
           ),
+          IconButton(
+            icon: const Icon(Icons.track_changes),
+            tooltip: 'Track Re-evaluations',
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => ReevaluationListScreen(
+                    reevaluations: reevaluations,
+                    startups: startups,
+                  ),
+                ),
+              );
+            },
+          ),
           Consumer(
             builder: (context, ref, _) {
               final user = ref.watch(authProvider).currentUser;
@@ -192,8 +265,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
               return PopupMenuButton<String>(
                 offset: const Offset(0, 48),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 tooltip: 'Account',
                 onSelected: (value) async {
                   if (value == 'profile') {
@@ -216,8 +288,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                         ),
                         actions: [
                           TextButton(
-                              onPressed: () => Navigator.of(context).pop(),
-                              child: const Text('Close')),
+                            onPressed: () => Navigator.of(context).pop(),
+                            child: const Text('Close'),
+                          ),
                         ],
                       ),
                     );
@@ -225,8 +298,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                     // Call your logout method from authProvider
                     await ref.read(authProvider).signOut();
                     Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(
-                          builder: (context) => const SignInScreen()),
+                      MaterialPageRoute(builder: (context) => const SignInScreen()),
                       (route) => false,
                     );
                   }
@@ -236,12 +308,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                     value: 'profile',
                     child: ListTile(
                       leading: CircleAvatar(
-                        backgroundImage: user.photoURL != null
-                            ? NetworkImage(user.photoURL!)
-                            : null,
-                        child: user.photoURL == null
-                            ? const Icon(Icons.person)
-                            : null,
+                        backgroundImage: user.photoURL != null ? NetworkImage(user.photoURL!) : null,
+                        child: user.photoURL == null ? const Icon(Icons.person) : null,
                       ),
                       title: Text(user.displayName ?? ''),
                       subtitle: Text(user.email ?? ''),
@@ -259,12 +327,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 child: Row(
                   children: [
                     CircleAvatar(
-                      backgroundImage: user.photoURL != null
-                          ? NetworkImage(user.photoURL!)
-                          : null,
-                      child: user.photoURL == null
-                          ? const Icon(Icons.person)
-                          : null,
+                      backgroundImage: user.photoURL != null ? NetworkImage(user.photoURL!) : null,
+                      child: user.photoURL == null ? const Icon(Icons.person) : null,
                     ),
                     const SizedBox(width: 8),
                     Text(
@@ -298,6 +362,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               ],
             ),
           ),
+          // Center content
           Expanded(
             flex: 3,
             child: SingleChildScrollView(
@@ -340,8 +405,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       ),
                       const SizedBox(height: 60),
                       Container(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 34, horizontal: 32),
+                        padding: const EdgeInsets.symmetric(vertical: 34, horizontal: 32),
                         decoration: BoxDecoration(
                           color: Colors.blueGrey.shade100,
                           borderRadius: BorderRadius.circular(32),
@@ -424,12 +488,10 @@ class CategoryFilteredScreen extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<CategoryFilteredScreen> createState() =>
-      _CategoryFilteredScreenState();
+  ConsumerState<CategoryFilteredScreen> createState() => _CategoryFilteredScreenState();
 }
 
-class _CategoryFilteredScreenState
-    extends ConsumerState<CategoryFilteredScreen> {
+class _CategoryFilteredScreenState extends ConsumerState<CategoryFilteredScreen> {
   String searchQuery = "";
   String? selectedSubCategory;
 
@@ -449,25 +511,16 @@ class _CategoryFilteredScreenState
     final String categoryKey = widget.category.toLowerCase();
     final List<String> subCategories = subCategoriesMap[categoryKey] ?? [];
 
-// Assume this value comes from a dropdown or user selection
-// If no subcategory is selected, keep it null or empty string
     String selectedCategory = categoryKey;
-    String? selectedSub = selectedSubCategory; // <-- single String, e.g. "AI"
+    String? selectedSub = selectedSubCategory;
 
     final filteredList = widget.startups.where((startup) {
-      // Check main category
       if (!startup.categories.contains(selectedCategory)) return false;
-
-      // Get startup's subcategories for that category
       final subs = startup.subCategories[selectedCategory] ?? [];
-
-      // If no specific subcategory selected, just match category
       if (selectedSub == null || selectedSub.isEmpty) return true;
-
-      // Otherwise match subcategory
       return subs.contains(selectedSub);
     }).toList();
-    
+
     return Scaffold(
       appBar: AppBar(
           title: Text('${widget.category.capitalize()} Ideas'),
@@ -476,7 +529,6 @@ class _CategoryFilteredScreenState
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            // Search and filter row
             SizedBox(
               height: 48,
               child: Row(
@@ -489,8 +541,8 @@ class _CategoryFilteredScreenState
                         prefixIcon: const Icon(Icons.search),
                         border: OutlineInputBorder(),
                         isDense: true,
-                        contentPadding: const EdgeInsets.symmetric(
-                            vertical: 12, horizontal: 16),
+                        contentPadding:
+                            const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                       ),
                       onChanged: (value) {
                         setState(() {
@@ -507,13 +559,9 @@ class _CategoryFilteredScreenState
                         final selected = await showModalBottomSheet<String?>(
                           context: context,
                           shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.vertical(
-                                  top: Radius.circular(18))),
+                              borderRadius: BorderRadius.vertical(top: Radius.circular(18))),
                           builder: (context) {
-                            final List<String?> options = [
-                              null,
-                              ...subCategories
-                            ];
+                            final List<String?> options = [null, ...subCategories];
                             return ListView(
                               shrinkWrap: true,
                               children: options.map((subCat) {
@@ -541,15 +589,12 @@ class _CategoryFilteredScreenState
                 ],
               ),
             ),
-
             const SizedBox(height: 18),
-
             Expanded(
               child: filteredList.isEmpty
                   ? const Center(child: Text("No results found"))
                   : GridView.builder(
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 4,
                         mainAxisSpacing: 12,
                         crossAxisSpacing: 12,
@@ -564,8 +609,8 @@ class _CategoryFilteredScreenState
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 10),
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -595,8 +640,7 @@ class _CategoryFilteredScreenState
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  idea.subCategories[categoryKey]?.join(', ') ??
-                                      '',
+                                  idea.subCategories[categoryKey]?.join(', ') ?? '',
                                   style: TextStyle(
                                     color: categoryKey == "technology"
                                         ? Colors.indigo
@@ -608,7 +652,7 @@ class _CategoryFilteredScreenState
                                 const SizedBox(height: 4),
                                 Text(
                                   idea.description,
-                                  maxLines: 3, // limit to avoid overflow
+                                  maxLines: 3,
                                   overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(
                                     fontSize: 12,
@@ -618,8 +662,8 @@ class _CategoryFilteredScreenState
                                 ),
                                 const Spacer(),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 6, vertical: 2),
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                   decoration: BoxDecoration(
                                     color: idea.approved
                                         ? Colors.green.shade100
@@ -815,7 +859,204 @@ class _GlassCategoryCardState extends State<GlassCategoryCard> {
   }
 }
 
+
+// Extensions:
+
 extension StringCap on String {
   String capitalize() =>
       isEmpty ? '' : '${this[0].toUpperCase()}${substring(1).toLowerCase()}';
+}
+
+// Reevaluation List Screen
+
+class ReevaluationListScreen extends StatelessWidget {
+  final List<DummyReevaluation> reevaluations;
+  final List<DummyStartup> startups;
+
+  const ReevaluationListScreen({
+    super.key,
+    required this.reevaluations,
+    required this.startups,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Re-evaluation Requests'),
+        backgroundColor: Colors.blueGrey.shade900,
+      ),
+      body: ListView.separated(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
+        itemCount: reevaluations.length,
+        separatorBuilder: (_, __) => const Divider(),
+        itemBuilder: (_, idx) {
+          final r = reevaluations[idx];
+          final s = startups.firstWhere(
+              (st) => st.id == r.startupId,
+              orElse: () => DummyStartup(
+                    id: 0,
+                    title: 'Unknown',
+                    categories: [],
+                    subCategories: {},
+                    approved: false,
+                    description: '',
+                  ));
+          return ListTile(
+            leading: const Icon(Icons.refresh, color: Colors.indigo),
+            title: Text(s.title),
+            subtitle: Text('Reason: ${r.reason}\nDate: ${r.requestedAt.toLocal()}'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => ReevaluationDetailScreen(reevaluation: r),
+                ),
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+}
+
+// Reevaluation Detail Screen
+
+class ReevaluationDetailScreen extends StatelessWidget {
+  final DummyReevaluation reevaluation;
+
+  const ReevaluationDetailScreen({super.key, required this.reevaluation});
+
+  @override
+  Widget build(BuildContext context) {
+    final processedDoc = reevaluation.documents.firstWhere(
+      (d) => d.type == "processed",
+      orElse: () => DummyDocument(
+          name: "Processed Document",
+          type: "processed",
+          content: "No summary available."),
+    );
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Re-evaluation Details'),
+        backgroundColor: Colors.blueGrey.shade900,
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          Text("Reason: ${reevaluation.reason}",
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          const SizedBox(height: 8),
+          Text('Requested At: ${reevaluation.requestedAt.toLocal()}'),
+          const SizedBox(height: 16),
+          const Text('Uploaded Documents:', style: TextStyle(fontWeight: FontWeight.bold)),
+          ...reevaluation.documents
+              .where((doc) => doc.type != "processed")
+              .map((doc) => Card(
+                    margin: const EdgeInsets.symmetric(vertical: 8),
+                    child: ListTile(
+                      leading:
+                          Icon(doc.type == "pitchdeck" ? Icons.picture_as_pdf : Icons.description),
+                      title: Text(doc.name),
+                      subtitle: Text(doc.content.length > 40
+                          ? doc.content.substring(0, 40) + '...'
+                          : doc.content),
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => DocumentViewerScreen(document: doc),
+                          ),
+                        );
+                      },
+                    ),
+                  )),
+          const Divider(),
+          const Text('Processed Document:', style: TextStyle(fontWeight: FontWeight.bold)),
+          Card(
+            margin: const EdgeInsets.symmetric(vertical: 8),
+            child: ListTile(
+              leading: const Icon(Icons.summarize, color: Colors.indigo),
+              title: const Text('View Summary'),
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => ProcessedDocumentScreen(summary: processedDoc.content),
+                  ),
+                );
+              },
+              subtitle: Text(
+                processedDoc.content.length > 48
+                    ? processedDoc.content.substring(0, 48) + '...'
+                    : processedDoc.content,
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
+              ),
+            ),
+          ),
+          const SizedBox(height: 18),
+          const Text('Conversation Transcripts:', style: TextStyle(fontWeight: FontWeight.bold)),
+          ...reevaluation.conversationTranscripts.map((txt) => Card(
+                margin: const EdgeInsets.symmetric(vertical: 6),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(txt),
+                ),
+              )),
+          if (reevaluation.conversationTranscripts.isEmpty)
+            const Text('No transcripts available.', style: TextStyle(color: Colors.grey)),
+        ],
+      ),
+    );
+  }
+}
+
+// Document Viewer Screen
+
+class DocumentViewerScreen extends StatelessWidget {
+  final DummyDocument document;
+
+  const DocumentViewerScreen({super.key, required this.document});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(document.name),
+        backgroundColor: Colors.blueGrey.shade900,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(18.0),
+        child: SelectableText(
+          document.content,
+          style: const TextStyle(fontSize: 16),
+        ),
+      ),
+    );
+  }
+}
+
+// Processed Document Screen
+
+class ProcessedDocumentScreen extends StatelessWidget {
+  final String summary;
+
+  const ProcessedDocumentScreen({super.key, required this.summary});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Processed Document"),
+        backgroundColor: Colors.blueGrey.shade900,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: SelectableText(
+          summary,
+          style: const TextStyle(fontSize: 16, height: 1.45),
+        ),
+      ),
+    );
+  }
 }
