@@ -54,7 +54,6 @@ class Startup {
   }
 }
 
-
 class DummyDocument {
   final String name;
   final String type; // 'pitchdeck', 'processed', etc.
@@ -173,7 +172,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           IconButton(
             icon: const Icon(Icons.track_changes),
             tooltip: 'Track Re-evaluations',
-            onPressed: () {
+            onPressed: () async {
+              final startups = await futureStartups; // fetch from future
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (_) => ReevaluationListScreen(
@@ -190,11 +190,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               if (user == null) return const SizedBox.shrink();
               return PopupMenuButton<String>(
                 offset: const Offset(0, 48),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16)),
                 tooltip: 'Account',
                 onSelected: (value) async {
                   if (value == 'profile') {
-                    // Show profile dialog
                     showDialog(
                       context: context,
                       builder: (_) => AlertDialog(
@@ -220,15 +220,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       ),
                     );
                   } else if (value == 'logout') {
-                    // Call your logout method from authProvider
-                    await ref.read(authProvider).signOut();
-                    Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(builder: (context) => const SignInScreen()),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                onSelected: (value) async {
-                  if (value == 'logout') {
                     await ref.read(authProvider).signOut();
                     Navigator.of(context).pushAndRemoveUntil(
                       MaterialPageRoute(builder: (_) => const SignInScreen()),
@@ -241,8 +232,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                     value: 'profile',
                     child: ListTile(
                       leading: CircleAvatar(
-                        backgroundImage: user.photoURL != null ? NetworkImage(user.photoURL!) : null,
-                        child: user.photoURL == null ? const Icon(Icons.person) : null,
+                        backgroundImage: user.photoURL != null
+                            ? NetworkImage(user.photoURL!)
+                            : null,
+                        child: user.photoURL == null
+                            ? const Icon(Icons.person)
+                            : null,
                       ),
                       title: Text(user.displayName ?? ''),
                       subtitle: Text(user.email ?? ''),
@@ -260,8 +255,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 child: Row(
                   children: [
                     CircleAvatar(
-                      backgroundImage: user.photoURL != null ? NetworkImage(user.photoURL!) : null,
-                      child: user.photoURL == null ? const Icon(Icons.person) : null,
+                      backgroundImage: user.photoURL != null
+                          ? NetworkImage(user.photoURL!)
+                          : null,
+                      child: user.photoURL == null
+                          ? const Icon(Icons.person)
+                          : null,
                     ),
                     const SizedBox(width: 8),
                     Text(user.displayName ?? '',
@@ -290,68 +289,16 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           final totalIdeas = startups.length.toString();
           final approvedIdeas =
               startups.where((s) => s.approved).length.toString();
-          print(
-              'Fetched ${startups.length} startups, $approvedIdeas approved. list of startups: $startups');
-          return Padding(
+
+         return Padding(
             padding: const EdgeInsets.all(16),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Image.asset(
-                  'assets/founder.png',
-                  width: 120,
-                  height: 120,
-                ),
-                const SizedBox(height: 16),
-                Text('Founder', style: TextStyle(fontWeight: FontWeight.bold)),
-              ],
-            ),
-          ),
-          // Center content
-          Expanded(
-            flex: 3,
-            child: SingleChildScrollView(
-              child: Center(
-                child: Container(
-                  margin: const EdgeInsets.all(36),
-                  padding: const EdgeInsets.all(40),
-                  constraints: const BoxConstraints(maxWidth: 700),
-                  decoration: BoxDecoration(
-                    color: Colors.blueGrey.shade50,
-                    borderRadius: BorderRadius.circular(36),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.blueGrey.withOpacity(0.07),
-                        blurRadius: 24,
-                        spreadRadius: 8,
-                        offset: const Offset(0, 0),
-                      ),
-                    ],
-                  ),
                 Expanded(
                   flex: 1,
                   child: Column(
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          GlassInfoCard(
-                            title: 'Total Ideas',
-                            value: totalIdeas,
-                            icon: Icons.lightbulb_outline,
-                            color: Colors.indigo.shade400,
-                          ),
-                          GlassInfoCard(
-                            title: 'Approved Ideas',
-                            value: approvedIdeas,
-                            icon: Icons.check_circle_outline,
-                            color: Colors.green.shade400,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 60),
-                      Container(
-                        padding: const EdgeInsets.symmetric(vertical: 34, horizontal: 32),
                       Image.asset('assets/investor.png',
                           width: 120, height: 120),
                       const SizedBox(height: 16),
@@ -486,27 +433,28 @@ class CategoryFilteredScreen extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<CategoryFilteredScreen> createState() => _CategoryFilteredScreenState();
+  ConsumerState<CategoryFilteredScreen> createState() =>
+      _CategoryFilteredScreenState();
 }
 
-class _CategoryFilteredScreenState extends ConsumerState<CategoryFilteredScreen> {
+class _CategoryFilteredScreenState
+    extends ConsumerState<CategoryFilteredScreen> {
   String searchQuery = "";
   String? selectedSubCategory;
 
   Map<String, List<String>> buildSubCategoriesMap(List<Startup> startups) {
-  final Map<String, Set<String>> dynamicMap = {};
-  for (final s in startups) {
-    for (final cat in s.categories) {
-      final key = cat.toLowerCase();
-      final subs = (s.subCategories[cat] ??
-                    s.subCategories[key] ??
-                    []) as List;
-      dynamicMap.putIfAbsent(key, () => <String>{});
-      dynamicMap[key]!.addAll(subs.map((e) => e.toString()));
+    final Map<String, Set<String>> dynamicMap = {};
+    for (final s in startups) {
+      for (final cat in s.categories) {
+        final key = cat.toLowerCase();
+        final subs =
+            (s.subCategories[cat] ?? s.subCategories[key] ?? []) as List;
+        dynamicMap.putIfAbsent(key, () => <String>{});
+        dynamicMap[key]!.addAll(subs.map((e) => e.toString()));
+      }
     }
+    return dynamicMap.map((k, v) => MapEntry(k, v.toList()..sort()));
   }
-  return dynamicMap.map((k, v) => MapEntry(k, v.toList()..sort()));
-}
 
   @override
   Widget build(BuildContext context) {
@@ -518,10 +466,6 @@ class _CategoryFilteredScreenState extends ConsumerState<CategoryFilteredScreen>
     String? selectedSub = selectedSubCategory;
 
     final filteredList = widget.startups.where((startup) {
-      if (!startup.categories.contains(selectedCategory)) return false;
-      final subs = startup.subCategories[selectedCategory] ?? [];
-      if (selectedSub == null || selectedSub.isEmpty) return true;
-      return subs.contains(selectedSub);
       // ✅ Case-insensitive main category match
       if (!startup.categories.any((c) => c.toLowerCase() == selectedCategory)) {
         return false;
@@ -572,8 +516,8 @@ class _CategoryFilteredScreenState extends ConsumerState<CategoryFilteredScreen>
                         prefixIcon: const Icon(Icons.search),
                         border: OutlineInputBorder(),
                         isDense: true,
-                        contentPadding:
-                            const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                        contentPadding: const EdgeInsets.symmetric(
+                            vertical: 12, horizontal: 16),
                       ),
                       onChanged: (value) {
                         setState(() {
@@ -590,9 +534,13 @@ class _CategoryFilteredScreenState extends ConsumerState<CategoryFilteredScreen>
                         final selected = await showModalBottomSheet<String?>(
                           context: context,
                           shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.vertical(top: Radius.circular(18))),
+                              borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(18))),
                           builder: (context) {
-                            final List<String?> options = [null, ...subCategories];
+                            final List<String?> options = [
+                              null,
+                              ...subCategories
+                            ];
                             return ListView(
                               shrinkWrap: true,
                               children: options.map((subCat) {
@@ -625,7 +573,8 @@ class _CategoryFilteredScreenState extends ConsumerState<CategoryFilteredScreen>
               child: filteredList.isEmpty
                   ? const Center(child: Text("No results found"))
                   : GridView.builder(
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 4,
                         mainAxisSpacing: 12,
                         crossAxisSpacing: 12,
@@ -640,8 +589,8 @@ class _CategoryFilteredScreenState extends ConsumerState<CategoryFilteredScreen>
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 10),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -671,7 +620,8 @@ class _CategoryFilteredScreenState extends ConsumerState<CategoryFilteredScreen>
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  idea.subCategories[categoryKey.capitalize()]?.join(', ') ??
+                                  idea.subCategories[categoryKey.capitalize()]
+                                          ?.join(', ') ??
                                       '',
                                   style: TextStyle(
                                     color: categoryKey == "technology"
@@ -694,8 +644,8 @@ class _CategoryFilteredScreenState extends ConsumerState<CategoryFilteredScreen>
                                 ),
                                 const Spacer(),
                                 Container(
-                                  padding:
-                                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 6, vertical: 2),
                                   decoration: BoxDecoration(
                                     color: idea.approved
                                         ? Colors.green.shade100
@@ -817,7 +767,6 @@ class GlassCategoryCard extends StatelessWidget {
   }
 }
 
-
 // Extensions:
 
 extension StringCap on String {
@@ -829,7 +778,7 @@ extension StringCap on String {
 
 class ReevaluationListScreen extends StatelessWidget {
   final List<DummyReevaluation> reevaluations;
-  final List<DummyStartup> startups;
+  final List<Startup> startups;
 
   const ReevaluationListScreen({
     super.key,
@@ -850,20 +799,26 @@ class ReevaluationListScreen extends StatelessWidget {
         separatorBuilder: (_, __) => const Divider(),
         itemBuilder: (_, idx) {
           final r = reevaluations[idx];
-          final s = startups.firstWhere(
-              (st) => st.id == r.startupId,
-              orElse: () => DummyStartup(
-                    id: 0,
-                    title: 'Unknown',
+          final s = startups.firstWhere((st) => st.id == r.startupId,
+              orElse: () => Startup(
+                    id: '0',
+                    name: 'Unknown',
+                    description: '',
                     categories: [],
                     subCategories: {},
+                    founder: '',
+                    founderId: '',
+                    score: 0.0,
+                    currentStatus: '',
                     approved: false,
-                    description: '',
+                    docsList: {},
                   ));
+
           return ListTile(
             leading: const Icon(Icons.refresh, color: Colors.indigo),
-            title: Text(s.title),
-            subtitle: Text('Reason: ${r.reason}\nDate: ${r.requestedAt.toLocal()}'),
+            title: Text(s.name),
+            subtitle:
+                Text('Reason: ${r.reason}\nDate: ${r.requestedAt.toLocal()}'),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
               Navigator.of(context).push(
@@ -905,18 +860,21 @@ class ReevaluationDetailScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         children: [
           Text("Reason: ${reevaluation.reason}",
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              style:
+                  const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           const SizedBox(height: 8),
           Text('Requested At: ${reevaluation.requestedAt.toLocal()}'),
           const SizedBox(height: 16),
-          const Text('Uploaded Documents:', style: TextStyle(fontWeight: FontWeight.bold)),
+          const Text('Uploaded Documents:',
+              style: TextStyle(fontWeight: FontWeight.bold)),
           ...reevaluation.documents
               .where((doc) => doc.type != "processed")
               .map((doc) => Card(
                     margin: const EdgeInsets.symmetric(vertical: 8),
                     child: ListTile(
-                      leading:
-                          Icon(doc.type == "pitchdeck" ? Icons.picture_as_pdf : Icons.description),
+                      leading: Icon(doc.type == "pitchdeck"
+                          ? Icons.picture_as_pdf
+                          : Icons.description),
                       title: Text(doc.name),
                       subtitle: Text(doc.content.length > 40
                           ? doc.content.substring(0, 40) + '...'
@@ -931,7 +889,8 @@ class ReevaluationDetailScreen extends StatelessWidget {
                     ),
                   )),
           const Divider(),
-          const Text('Processed Document:', style: TextStyle(fontWeight: FontWeight.bold)),
+          const Text('Processed Document:',
+              style: TextStyle(fontWeight: FontWeight.bold)),
           Card(
             margin: const EdgeInsets.symmetric(vertical: 8),
             child: ListTile(
@@ -940,7 +899,8 @@ class ReevaluationDetailScreen extends StatelessWidget {
               onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (_) => ProcessedDocumentScreen(summary: processedDoc.content),
+                    builder: (_) =>
+                        ProcessedDocumentScreen(summary: processedDoc.content),
                   ),
                 );
               },
@@ -953,7 +913,8 @@ class ReevaluationDetailScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 18),
-          const Text('Conversation Transcripts:', style: TextStyle(fontWeight: FontWeight.bold)),
+          const Text('Conversation Transcripts:',
+              style: TextStyle(fontWeight: FontWeight.bold)),
           ...reevaluation.conversationTranscripts.map((txt) => Card(
                 margin: const EdgeInsets.symmetric(vertical: 6),
                 child: Padding(
@@ -962,7 +923,8 @@ class ReevaluationDetailScreen extends StatelessWidget {
                 ),
               )),
           if (reevaluation.conversationTranscripts.isEmpty)
-            const Text('No transcripts available.', style: TextStyle(color: Colors.grey)),
+            const Text('No transcripts available.',
+                style: TextStyle(color: Colors.grey)),
         ],
       ),
     );

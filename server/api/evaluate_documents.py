@@ -23,12 +23,14 @@ from utils.audio_utils import get_audio_base64
 from utils.session_utils import get_session, save_session, session_file
 from models.gemini_client import GeminiClient
 from services.gcs_service import GCSService
-# from services.gmail_service import GmailService
+from services.gmail_service import GmailService
 from datetime import datetime
 from typing import Dict
 from services.firestore_service import FirestoreService
 from schemas.models import EvaluationRequest, RequestStage, Startup
 import mimetypes
+import re
+
 USE_GPT_STT = False
 
 language = 'en'
@@ -44,7 +46,7 @@ os.makedirs(SESSION_DIR, exist_ok=True)
 
 router = APIRouter()
 
-# gmailService = GmailService()
+gmailService = GmailService()
 
 # Memory of collected info per session
 conversations = {}
@@ -210,10 +212,22 @@ async def export_data(session_id: str, format: str):
 
     return {"error": "Invalid format"}
 
-# def send_email(to, subject, body, sender="evalora@gmail.com"):
-#     gmailService.send_email(to, subject, body, sender)
+def send_email(to, subject, body, sender="evaloraofficial@gmail.com", file_path=None):
+    if file_path:
+        gmailService.send_email_with_attachment(sender, to, subject, body, file_path) 
+    else:
+        gmailService.send_email(to, subject, body, sender)
 
-async def evaluate_startup_documents(uploaded_files, founder_name, founder_email, startup_name, request_id):
+def extract_score_from_summary(file_path: str) -> float:
+    with open(file_path, "r") as f:
+        content = f.read()
+
+    match = re.search(r"EVALORA_SCORE:\s*(\d+(\.\d+)?)", content)
+    if match:
+        return float(match.group(1))
+    return 0.0  # default if pattern not found
+
+async def evaluate_startup_documents(background_tasks, uploaded_files, founder_name, founder_email, startup_name, request_id):
     docs = dict()
 
     for topic, file_paths in uploaded_files.items():
@@ -247,10 +261,40 @@ async def evaluate_startup_documents(uploaded_files, founder_name, founder_email
     
     summary = await geminiClient.analyze_documents(request_id=request_id,founder_name=founder_name,founder_email=founder_email,startup_name=startup_name,docs=docs)
 
-    summary_path = f"summaries/{startup_name}_{request_id}.txt"
+    summary_path = f"summaries/{startup_name}_{request_id}.md"
     os.makedirs("summaries", exist_ok=True)
-    with open(summary_path, "w") as f:
+    with open(summary_path, "w", encoding="utf-8") as f:
         f.write(summary)
+    score = extract_score_from_summary(summary_path)
+    is_qualified = score > 3.5
+
+    # Send email with summary
+    email_content = f"""Dear {founder_name},
+
+Thank you for submitting your documents for your startup evaluation.
+
+Please find attached a summary of the documents you provided.
+
+Based on our initial review, your submission has {'met the qualification criteria' if is_qualified else 'not met the qualification criteria at this stage'}.
+
+{"Our Evalora team will reach out to you shortly to schedule an evaluation session with an Evalora agent. During this session, we will discuss your startup in detail and provide guidance on the next steps." if is_qualified else "If you believe there are discrepancies in the evaluation, please raise a re-evaluation ticket and our team will review it."}
+
+If you have any questions in the meantime, please feel free to contact us.
+
+Sincerely,
+Evalora Team
+"""
+
+
+    background_tasks.add_task(
+        send_email,
+        founder_email,
+        f"Evalora Document Evaluation Result – {startup_name} : REQ-{request_id}",
+        email_content,
+        "evaloraofficial@gmail.com",
+        summary_path
+    )
+    
 
     gcsService.upload_file(open(summary_path, "rb"), f"{request_id}/summary_{startup_name}_{request_id}.md", content_type="text/plain")
 
@@ -351,23 +395,27 @@ async def analyze_documents(
 
     # ---------- 4️⃣ Background tasks ----------
     email_content = (
-        f"Dear {founder_name},\n\n"
-        f"Your request has been submitted successfully.\n"
-        f"Request ID: {request_id}\n\n"
-        f"Our team will review your documents shortly.\n\n"
-        f"Regards,\nEvalora Team"
-    )
+    f"Dear {founder_name},\n\n"
+    f"We are pleased to inform you that your request has been successfully submitted.\n"
+    f"Request ID: {request_id}\n\n"
+    f"Our team will review the submitted documents and respond to you promptly.\n\n"
+    f"If you have any questions in the meantime, please do not hesitate to contact us.\n\n"
+    f"Sincerely,\n"
+    f"Evalora Team"
+)
 
-    # background_tasks.add_task(
-    #     send_email,
-    #     founder_email,
-    #     f"Evalora Document Request – {startup_name}",
-    #     email_content,
-    #     "evaloraofficial@gmail.com",
-    # )
+
+    background_tasks.add_task(
+        send_email,
+        founder_email,
+        f"Evalora Document Request – {startup_name} : REQ-{request_id}",
+        email_content,
+        "evaloraofficial@gmail.com",
+    )
 
     background_tasks.add_task(
         evaluate_startup_documents,
+        background_tasks,
         uploaded_files,
         founder_name,
         founder_email,

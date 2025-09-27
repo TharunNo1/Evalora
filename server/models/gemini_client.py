@@ -1,10 +1,10 @@
 import os
 from typing import Dict, Optional
 import google.generativeai as genai
-
+import re
 
 class GeminiClient:
-    def __init__(self, api_key: Optional[str] = None, model_name: str = "gemini-1.5-flash"):
+    def __init__(self, api_key: Optional[str] = None, model_name: str = "gemini-2.5-flash-lite"):
         """
         GeminiService handles interaction with Google's Gemini model for document analysis.
         """
@@ -14,6 +14,9 @@ class GeminiClient:
         
         genai.configure(api_key=self.api_key)
         self.model = genai.GenerativeModel(model_name)
+
+
+
 
     # ---------- Prompt Builder ----------
     def build_prompt(
