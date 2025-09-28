@@ -63,8 +63,34 @@ client/
 ## Screenshots
 
 <p align="center">
-  <img src="../client/assets/dashboard.jpg" alt="Dashboard Screenshot" width="400"/>
-  <img src="../client/assets/submission.jpg" alt="Request Submission" width="400"/>
+
+<table>
+  <tr>
+    <td align="center">
+      <img src="../client/assets/dashboard.jpg" alt="Dashboard Screenshot" width="300" 
+           style="border:1px solid #ddd; border-radius:8px; box-shadow: 2px 2px 8px rgba(0,0,0,0.2);"/><br>
+      <b>Dashboard Overview</b>
+    </td>
+    <td align="center">
+      <img src="../client/assets/sub_dashboard.jpg" alt="Sub Dashboard (with filter)" width="300"
+           style="border:1px solid #ddd; border-radius:8px; box-shadow: 2px 2px 8px rgba(0,0,0,0.2);"/><br>
+      <b>Sub Dashboard with Filters</b>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="../client/assets/DetailsSubmission.png" alt="Request Submission - Details" width="300"
+           style="border:1px solid #ddd; border-radius:8px; box-shadow: 2px 2px 8px rgba(0,0,0,0.2);"/><br>
+      <b>Request Submission - Details</b>
+    </td>
+    <td align="center">
+      <img src="../client/assets/DocSubmission.png" alt="Request Submission - Docs" width="300"
+           style="border:1px solid #ddd; border-radius:8px; box-shadow: 2px 2px 8px rgba(0,0,0,0.2);"/><br>
+      <b>Request Submission - Document Upload</b>
+    </td>
+  </tr>
+</table>
+
 </p>
 
 ---
