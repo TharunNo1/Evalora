@@ -1,118 +1,104 @@
 # Evalora
 
-🌟 Evalora – AI-Driven Startup Evaluation Platform
+**Evalora** is an advanced AI-powered platform designed to transform how founders connect with investors. By harnessing cutting-edge technologies—Google Cloud, Kafka, Gemini AI, and a dynamic multi-agent framework—Evalora delivers a seamless experience from pitch submission to investor engagement. The platform bridges artificial intelligence with essential human judgment, ensuring evaluations are thorough, transparent, and actionable.
 
-Evalora is an AI-powered startup evaluation platform designed to help founders present their startup ideas, get AI-assisted insights, and receive human-in-the-loop (HITL) approvals before moving forward to investor meetings.
-The platform leverages Google Cloud, Kafka, Gemini AI, and a multi-agent architecture to provide a scalable, production-ready system.
+---
 
-🚀 Key Features
+## Features
 
-- Founder Call Intake – Founders can submit their startup pitch via a Flutter mobile/web app.
+- **Intuitive Pitch Intake**: Submit startup pitches via a responsive Flutter-based mobile or web interface for a streamlined user experience.
+- **AI-Driven Evaluation**: Multi-agent Gemini AI processes speech, extracts structured insights, and generates comprehensive recommendations for each pitch.
+- **Human-in-the-Loop Assurance**: Skilled reviewers verify AI-driven evaluations, maintaining fairness and reliability throughout the process.
+- **Automated Investor Coordination**: Approved pitches are scheduled with investors via Google Calendar integration, removing friction from networking.
+- **Cloud-Native & Scalable**: Kafka, Docker, and GKE/Cloud Run provide high availability, resilience, and scalability.
 
-- AI Multi-Agent Processing – Gemini-powered agents transcribe calls, summarize key points, and extract actionable insights.
+---
 
-- Human-in-the-Loop (HITL) Review – Human reviewers approve or reject AI evaluations for accuracy and fairness.
+## Architecture Overview
 
-- Investor Scheduling – Approved startups are automatically scheduled for investor calls via the Google Calendar API.
+Evalora is built on a **modular, cloud-native architecture** with two primary modules:
 
-- Event-Driven & Scalable – Powered by Kafka / PubSub, containerized with Docker, and deployed on GKE / Cloud Run.
+### 1. Founder Intake & AI Processing
+- **Frontend**: Flutter (mobile/web) for live pitch submission and progress updates.
+- **Backend**: API Gateway (REST/gRPC) in Python/Node.js manages communication and business logic.
+- **Messaging**: Kafka Pub/Sub ensures reliable, event-driven data flow.
+- **AI Processing**: Gemini-powered agents automate transcription, summarization, and evaluation.
+- **Queueing**: Recommendations are published to the HITL (Human-in-the-Loop) review queue for validation.
 
-🏗️ System Architecture
+### 2. HITL Review & Investor Scheduling
+- **Human Review Workflow**: Certified reviewers ensure quality and fairness.
+- **Automated Scheduling**: Approved startups are matched with investors using Google Calendar APIs.
+- **Data Backbone**: Google Cloud Storage, BigQuery, Redis, and Firebase support analytics, storage, and caching.
 
-Evalora follows a modular, scalable, cloud-native design.
-The system is divided into two main modules for ease of understanding and deployment.
+---
 
-Module 1: Founder Intake & AI Processing
+## Technology Stack
 
-- Frontend: Flutter (Mobile/Web) for founder intake & live updates.
+| Layer             | Technology                              |
+|------------------|-----------------------------------------|
+| Frontend          | Flutter (Mobile/Web), Firebase Hosting |
+| Backend           | Python, Node.js, API Gateway, gRPC     |
+| AI & Agents       | Gemini AI, Custom LLM Agents           |
+| Messaging         | Kafka, Google Pub/Sub                   |
+| Storage           | Google Cloud Storage, BigQuery         |
+| Cache             | Redis, Memorystore                      |
+| Human Review      | Reviewer Dashboard (Flutter/Web)       |
+| Deployment        | Docker, Kubernetes (GKE), Cloud Run   |
+| Monitoring        | Google Cloud Logging & Monitoring      |
+| Integrations      | Google Calendar API, Gmail API         |
 
-- Backend: API Gateway with REST/gRPC endpoints.
+---
 
-- Messaging: Kafka / PubSub for event-driven communication.
+## Workflow Summary
 
-- AI Layer: Multi-Agent Gemini AI for transcription, summarization, and idea evaluation.
+1. **Pitch Submission**: Founders submit pitches via the Flutter app or website.
+2. **AI Evaluation**: AI pipeline generates structured assessments.
+3. **Human Review**: Experts validate AI output for quality and transparency.
+4. **Investor Scheduling**: Qualified startups are automatically connected to investors.
 
-- ➡️ Output: AI-generated evaluation and recommendation is published to the HITL Approval Queue.
+---
 
-Module 2: HITL Approval & Investor Scheduling
+## Project Structure
 
-- HITL Workflow: Human reviewers approve or reject AI evaluations.
-
-- Decision Processing: Approved startups trigger automated investor scheduling.
-
-- Data Layer: Google Cloud Storage (GCS), BigQuery, Redis, and Firebase for analytics, caching, and hosting.
-
-- Investor Integration: Google Calendar API for investor call scheduling.
-
-🧩 Tech Stack
-Layer	Technology
-Frontend	Flutter (Mobile + Web), Firebase Hosting
-Backend	Python / Node.js, API Gateway, gRPC
-AI & Agents	Gemini AI, Custom LLM Agents
-Messaging	Kafka, Google Pub/Sub
-Storage	Google Cloud Storage (GCS), BigQuery
-Cache	Redis / Memorystore
-Human Review	Reviewer Dashboard (Flutter / Web)
-Deployment	Docker, Kubernetes (GKE), Cloud Run
-Monitoring	Google Cloud Logging & Monitoring
-Integrations	Google Calendar API, Gmail API
-
-🖼️ High-Level Flow
-
-1️⃣ Founder Intake → Founders submit startup pitches via Flutter Web/Mobile.
-2️⃣ AI Processing → Gemini AI agents process calls and generate evaluations.
-3️⃣ Human Review → Human reviewers approve or reject the AI results.
-4️⃣ Investor Scheduling → Approved startups are scheduled for investor calls.
-
-📂 Project Structure
 ```bash
 evalora/
-│
-├─ client/             # Flutter mobile & web app
-├─ server/             # Backend service
-├─ ventureSense/       # Multi agent architecture
-```
+├─ client/        # Flutter mobile & web app
+├─ server/        # Backend services
+├─ ventureSense/  # Multi-agent architecture
 
-🛠️ Deployment Steps
-- Yet to be update
-- 
-📊 Monitoring & Analytics
+## Monitoring & Analytics
 
-- Google Cloud Monitoring – Service health and latency tracking.
-- BigQuery – Investor engagement analytics and AI evaluation metrics.
-- Cloud Logging – Centralized logs for AI agent performance.
+- **Health Monitoring**: Google Cloud Monitoring tracks uptime and latency at every tier.
+- **Engagement Metrics**: BigQuery supports real-time analysis of investor and founder interactions.
+- **Central Logging**: Comprehensive logs centralize diagnostics for all AI and backend processes.
 
-🤝 Contributing
+---
 
-We welcome contributions to improve Evalora:
+## Contributing
 
-- Fork the repository.
+We welcome contributions to Evalora!  
 
-- Create a feature branch (feature/amazing-idea).
+1. Fork the repository  
+2. Create a feature branch (e.g., `feature/amazing-idea`)  
+3. Submit a detailed Pull Request  
 
-- Submit a pull request.
+---
 
-📜 License
+## License
 
-- Evalora is released under the Apache 2.0 License.
-- See LICENSE for details.
+Evalora is open-sourced under the **Apache 2.0 License**. For legal details, see the [LICENSE](LICENSE) file.
 
-🌱 Roadmap
+---
 
- - Add support for multi-language transcription.
+## Roadmap
 
- - Integrate payment & subscription models for premium investors.
+- Multi-language pitch transcription  
+- Premium investor tiers and subscription payment support  
+- Mobile app for real-time investor notifications  
+- Founder ratings incorporating AI explainability  
 
- - Build a mobile investor app for real-time pitch notifications.
+---
 
- - Introduce founder rating scores with AI explainability.
+## Vision
 
-💡 Inspiration
-
-- Evalora aims to streamline startup discovery and evaluation by combining:
-
-- AI Intelligence – Gemini-driven evaluation to reduce bias.
-
-- Human Judgment – Human reviewers ensure fairness and trust.
-
-- Investor Efficiency – Direct investor scheduling for promising startups.
+Evalora reimagines the startup evaluation journey by uniting innovative AI, rigorous expert review, and efficient investor matchmaking. Our mission is to deliver **clarity, trust, and opportunity** in every founder’s journey.
