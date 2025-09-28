@@ -116,15 +116,3 @@ Evalora is open-sourced under the **Apache 2.0 License**. For legal details, see
 ## Vision
 
 Evalora reimagines the startup evaluation journey by uniting innovative AI, rigorous expert review, and efficient investor matchmaking. Our mission is to deliver **clarity, trust, and opportunity** in every founder’s journey.
-
-### ✅ Notes:
-
-1. **Badges**: You can add GitHub workflow, build, and license badges at the top for a more professional touch.  
-2. **Collapsible Sections**: I added collapsible `<details>` sections for Architecture modules to reduce clutter.  
-3. **Images**: Replace `assets/evalora_logo.png` with your actual logo path.  
-
----
-
-If you want, I can also make a **version with a visually appealing table of features, workflow diagram placeholders, and colored section headers** for a **more “startup pitch” style README** suitable for investors or public GitHub.  
-
-Do you want me to do that next?
