@@ -77,8 +77,8 @@ flutter:
 
   assets:
     - assets/logo.png
-    - assets/founder.png
-    - assets/investor.png
+    - assets/founder_vector.png
+    - assets/investor_vector.png
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg

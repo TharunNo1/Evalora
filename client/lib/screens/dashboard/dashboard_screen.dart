@@ -130,7 +130,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
   Future<List<Startup>> fetchStartups() async {
     // 🔑 Replace with your actual backend endpoint
-    const String apiUrl = "https://evalora-service-158695644143.asia-south1.run.app/startups";
+    const String apiUrl =
+        "https://evalora-service-158695644143.asia-south1.run.app/startups";
 
     final response = await http.get(Uri.parse(apiUrl));
     if (response.statusCode == 200) {
@@ -290,7 +291,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           final approvedIdeas =
               startups.where((s) => s.approved).length.toString();
 
-         return Padding(
+          return Padding(
             padding: const EdgeInsets.all(16),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -299,11 +300,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   flex: 1,
                   child: Column(
                     children: [
-                      Image.asset('assets/investor.png',
-                          width: 120, height: 120),
+                      Image.asset('assets/investor_vector.png',
+                          width: 900, height:400, fit: BoxFit.fill),
                       const SizedBox(height: 16),
-                      const Text('Investor',
-                          style: TextStyle(fontWeight: FontWeight.bold)),
                     ],
                   ),
                 ),
@@ -398,11 +397,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   flex: 1,
                   child: Column(
                     children: [
-                      Image.asset('assets/founder.png',
-                          width: 120, height: 120),
+                      Image.asset('assets/founder_vector.png',
+                           width:900, height: 400, fit: BoxFit.fill),
                       const SizedBox(height: 16),
-                      const Text('Founder',
-                          style: TextStyle(fontWeight: FontWeight.bold)),
                     ],
                   ),
                 ),

@@ -113,8 +113,8 @@ class _UploadScreenState extends State<UploadScreen> {
       await addFilesToFormData("callTranscripts", callTranscripts, formData);
 
       final response = await dio.post(
-        // "https://evalora-service-158695644143.asia-south1.run.app/analyze-documents/",
-        "http://127.0.0.1:8000/analyze-documents/",
+        "https://evalora-service-158695644143.asia-south1.run.app/analyze-documents/",
+        // "http://127.0.0.1:8000/analyze-documents/",
         data: formData,
         options: Options(contentType: 'multipart/form-data'),
       );
@@ -127,7 +127,7 @@ class _UploadScreenState extends State<UploadScreen> {
         founderName = "";
         founderEmail = "";
         technologiesUsed = "";
-        industryDomains = ""; 
+        industryDomains = "";
         checklistFile = null;
         pitchDeckFiles = [];
         emailMessages = [];
@@ -135,12 +135,71 @@ class _UploadScreenState extends State<UploadScreen> {
         callTranscripts = [];
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Documents submitted successfully!")));
+      // ✅ Show success dialog
+      _showResultOverlay(
+          success: true,
+          message:
+              "Your documents have been submitted successfully! We will reach out to you via email soon.");
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("Submission failed: $e")));
+      // ✅ Show failure dialog
+      _showResultOverlay(
+          success: false, message: "Submission failed. Please try again.");
     }
+  }
+
+// Helper method to show success/failure dialog
+  void _showResultOverlay({required bool success, required String message}) {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // user must tap the button to close
+      builder: (ctx) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        elevation: 16,
+        child: Container(
+          width: 300,
+          padding: EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                success ? Icons.emoji_events : Icons.error_outline,
+                color: success ? Colors.green : Colors.red,
+                size: 60,
+              ),
+              SizedBox(height: 16),
+              Text(
+                success ? "Congratulations!" : "Oops!",
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+              SizedBox(height: 12),
+              Text(
+                message,
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 16, color: Colors.black54),
+              ),
+              SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: () => Navigator.of(ctx).pop(),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: success ? Colors.green : Colors.red,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                  padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                ),
+                child: Text(
+                  success ? "Close" : "Retry",
+                  style: TextStyle(fontSize: 16, color: Colors.white),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   void _openUploadDialog({
@@ -284,7 +343,6 @@ class _UploadScreenState extends State<UploadScreen> {
     );
   }
 
- 
   @override
   Widget build(BuildContext context) {
     List<String> technologyOptions = [
@@ -315,7 +373,6 @@ class _UploadScreenState extends State<UploadScreen> {
     Set<String> selectedTechnology = {};
     Set<String> selectedIndustry = {};
 
-
     return Scaffold(
       appBar: AppBar(
         title: Text("Evaluation Request Submission"),
@@ -345,20 +402,21 @@ class _UploadScreenState extends State<UploadScreen> {
               _buildTextField("Founder Email ID", (v) => founderEmail = v ?? "",
                   keyboardType: TextInputType.emailAddress),
               SizedBox(height: 16),
-            
               Row(
-      children: [
-        Expanded(
-          child:  _buildTextField("Technologies used (Comma separated)", (v) => technologiesUsed = v ?? ""),
-        ),
-        SizedBox(width: 16),
-        Expanded(
-          child:  _buildTextField("Industry domains (Comma separated)", (v) => industryDomains = v ?? ""),
-        ),
-      ],
-    ),
-              
-    SizedBox(height: 32),
+                children: [
+                  Expanded(
+                    child: _buildTextField(
+                        "Technologies used (Comma separated)",
+                        (v) => technologiesUsed = v ?? ""),
+                  ),
+                  SizedBox(width: 16),
+                  Expanded(
+                    child: _buildTextField("Industry domains (Comma separated)",
+                        (v) => industryDomains = v ?? ""),
+                  ),
+                ],
+              ),
+              SizedBox(height: 32),
               _uploadSection(
                 "Upload Checklist (PDF)",
                 Icons.picture_as_pdf,

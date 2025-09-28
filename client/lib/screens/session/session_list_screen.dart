@@ -5,8 +5,8 @@ import 'package:url_launcher/url_launcher.dart';
 class SessionListScreen extends StatelessWidget {
   const SessionListScreen({super.key});
 
-  Future<void> _openUrlForVoiceChat() async {
-    const url = 'http://localhost:3000';
+  Future<void> _openUrlForVoiceChat(String requestID) async {
+    var url = 'https://evalorasession.web.app/?requestID='+requestID;
 
     final Uri uri = Uri.parse(url);
 
@@ -145,7 +145,7 @@ class SessionListScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                onPressed: isScheduled ? _openUrlForVoiceChat : null,
+                onPressed: isScheduled ?  () => _openUrlForVoiceChat(session['requestID'].toString()) : null,
                 child: Text(isScheduled ? 'Join' : 'Done',
                     style: const TextStyle(color: Colors.white)),
               ),
