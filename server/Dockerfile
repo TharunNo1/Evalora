@@ -50,4 +50,4 @@ EXPOSE 8080
 
 # Start the app with Gunicorn + Uvicorn worker
 CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "main:app", \
-     "--bind", "0.0.0.0:8080", "--workers", "2", "--threads", "8", "--timeout", "60"]
+     "--bind", "0.0.0.0:8080", "--workers", "2", "--threads", "8", "--timeout", "300"]

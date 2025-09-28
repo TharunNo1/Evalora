@@ -7,6 +7,7 @@ from google_auth_oauthlib.flow import Flow
 from google.auth.transport.requests import Request as GoogleRequest
 from googleapiclient.discovery import build
 from dotenv import load_dotenv
+from services.gmail_service import GmailService
 
 load_dotenv()
 
@@ -27,6 +28,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# @app.on_event("startup")
+# async def startup_event():
+#     """Authenticate Gmail once when server starts."""
+#     GmailService.get_instance()
+#     print("✅ GmailService authenticated at startup")
 # Include API router
 from api.voice import router as voice_router
 # Include evaluate_documents router

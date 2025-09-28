@@ -46,7 +46,7 @@ os.makedirs(SESSION_DIR, exist_ok=True)
 
 router = APIRouter()
 
-gmailService = GmailService()
+gmailService = GmailService.get_instance()
 
 # Memory of collected info per session
 conversations = {}
@@ -411,6 +411,7 @@ async def analyze_documents(
         f"Evalora Document Request – {startup_name} : REQ-{request_id}",
         email_content,
         "evaloraofficial@gmail.com",
+        None
     )
 
     background_tasks.add_task(
